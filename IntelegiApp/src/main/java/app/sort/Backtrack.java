@@ -9,7 +9,8 @@ public class Backtrack {
 
 		Operator op;
 
-		LinkedList<Operator> unused;		
+		LinkedList<Operator> unused;
+		double cost;
 
 		Node(State state, Operator op, Collection<Operator> ops) {
 			this.state = state;

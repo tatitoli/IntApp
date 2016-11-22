@@ -1,17 +1,33 @@
 package app.sort;
 
+
+import java.util.Date;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class PresentationOperator implements Operator{
 
+	final String FORMAT = "mm:ss";
+	
 	int id;
-	String time;
+	String fromTime;
+	String toTime;
 	int day;
 	
-	public PresentationOperator(int id,String time, int day) {
-        this.time = time;
-        this.day = day;
-        this.id = id;
-    }
-	
+	public PresentationOperator(int id, String fromTime, String toTime, int day) {
+		super();
+		this.id = id;
+		this.fromTime = fromTime;
+		this.toTime = toTime;
+		this.day = day;
+	}
+
 	@Override
 	public boolean isApplicable(State s) {
 		return true;
@@ -24,29 +40,31 @@ public class PresentationOperator implements Operator{
 
 	@Override
 	public boolean isApplicable(State s, Operator o) {
+		DateFormat formatter = new SimpleDateFormat(FORMAT);
+		Date fromDateOperator = null;
+		Date fromDatePresentation = null;
 		PresentationState state = (PresentationState)s;
 		PresentationOperator operator = (PresentationOperator)o;
-		int[][] data = new int[12][2];
-		data = state.getData();
-		for (int i = 0; i < 12; i++) {
-			for (int j = 0; j < 2; j++) {
-				if(data[i][j] == operator.id){
+		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
+		List<Presentation> presentations = new ArrayList<>();
+		actualEvent = state.getEvent();
+		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet())
+		{
+			presentations = entry.getValue();
+			for(int i=0; i < presentations.size(); i++){
+				if(presentations.get(i).getiD() == operator.id){
 					return false;
 				}
+				try {
+					fromDateOperator = formatter.parse(operator.fromTime);
+					fromDatePresentation = formatter.parse(presentations.get(i).getFrom());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				Timestamp from = new Timestamp(fromDateOperator.getTime());
 			}
 		}
-		if(data[Integer.parseInt(operator.getTime())-8][operator.getDay()-1] != 0){
-			return false;
-		}
 		return true;
-	}
-
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
 	}
 
 	public int getDay() {
@@ -61,16 +79,25 @@ public class PresentationOperator implements Operator{
 	public State apply(State s, Operator o) {
 		PresentationState state = (PresentationState)s;
 		PresentationOperator operator = (PresentationOperator)o;
-		int[][] data = new int[12][2];
-		data = state.getData();
-		data[Integer.parseInt(operator.getTime())-8][operator.getDay()-1] = operator.id;
+		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
+		List<Presentation> presentations = new ArrayList<>();
+		actualEvent = state.getEvent();
+		if(actualEvent.containsKey(operator.day)){
+			presentations = actualEvent.get(operator.day);
+			presentations.add(new Presentation(operator.id,operator.day, operator.fromTime,operator.toTime));
+			actualEvent.put(operator.day, presentations);
+		}else{
+			presentations.add(new Presentation(operator.id,operator.day, operator.fromTime,operator.toTime));
+			actualEvent.put(operator.day,presentations);
+		}
 		PresentationState newState = new PresentationState();
-		newState.setData(data);
+		newState.setEvent(actualEvent);
 		return newState;
 	}
 
 	@Override
 	public String toString() {
-		return "PresentationOperator [id=" + id + ", time=" + time + ", day=" + day + "]";
+		return "PresentationOperator [id=" + id + ", fromTime=" + fromTime + ", toTime=" + toTime + ", day=" + day
+				+ "]";
 	}
 }
