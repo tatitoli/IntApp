@@ -5,17 +5,28 @@ public class Presentation {
 	private int day;
 	private String from;
 	private String to;
+	private int topic;
 	
 	public Presentation(){
 		
 	}
 	
-	public Presentation(int iD, int day, String from, String to) {
+	public Presentation(int iD, int day, String from, String to, int topic) {
 		this.iD = iD;
 		this.day = day;
 		this.from = from;
 		this.to = to;
+		this.topic = topic;
 	}
+	
+	public int getTopic() {
+		return topic;
+	}
+
+	public void setTopic(int topic) {
+		this.topic = topic;
+	}
+
 	public int getiD() {
 		return iD;
 	}

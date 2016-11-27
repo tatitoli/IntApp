@@ -2,7 +2,7 @@ package app.view;
 
 import java.io.File;
 
-import app.sort.Backtrack;
+import app.sort.Algorythm;
 import app.sort.PresentationProblem;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -47,7 +47,8 @@ public class MainForm extends Application {
 	public static void main(String[] args) {
 //		launch(args);
 		PresentationProblem problem = new PresentationProblem();
-		Backtrack algorithm = new Backtrack(problem);
+		Algorythm algorithm = new Algorythm(problem);
+//		Optimal algorithm=new Optimal(problem);
 		algorithm.run();
 		System.out.println(algorithm.getGoal());
 	}
