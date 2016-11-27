@@ -41,7 +41,17 @@ public class PresentationState implements State {
 	}
 	
 	public String getGoal(){
-		return "Siker";
+		StringBuilder sb = new StringBuilder();
+		List<Presentation> presentations;
+		for (Map.Entry<Integer, List<Presentation>> entry : event.entrySet())
+		{
+			presentations = entry.getValue();
+			for(int i=0; i < presentations.size(); i++){
+				sb.append(presentations.get(i).toString());
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 
 	public Map<Integer, List<Presentation>> getEvent() {

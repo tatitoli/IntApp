@@ -1,12 +1,12 @@
 package app.sort;
 
 
-import java.util.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +41,8 @@ public class PresentationOperator implements Operator{
 	@Override
 	public boolean isApplicable(State s, Operator o) {
 		DateFormat formatter = new SimpleDateFormat(FORMAT);
+		Date toDateOperator = null;
+		Date toDatePresentation = null;
 		Date fromDateOperator = null;
 		Date fromDatePresentation = null;
 		PresentationState state = (PresentationState)s;
@@ -58,10 +60,19 @@ public class PresentationOperator implements Operator{
 				try {
 					fromDateOperator = formatter.parse(operator.fromTime);
 					fromDatePresentation = formatter.parse(presentations.get(i).getFrom());
+					toDateOperator = formatter.parse(operator.toTime);
+					toDatePresentation = formatter.parse(presentations.get(i).getTo());
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
-				Timestamp from = new Timestamp(fromDateOperator.getTime());
+//				Timestamp fromOp = new Timestamp(fromDateOperator.getTime());
+//				Timestamp fromPe = new Timestamp(fromDatePresentation.getTime());
+//				Timestamp toOp = new Timestamp(toDateOperator.getTime());
+//				Timestamp toPe = new Timestamp(toDatePresentation.getTime());
+				if(fromDatePresentation.getTime() <= fromDateOperator.getTime() && toDatePresentation.getTime()
+						 > toDateOperator.getTime()){
+					return false;
+				}
 			}
 		}
 		return true;

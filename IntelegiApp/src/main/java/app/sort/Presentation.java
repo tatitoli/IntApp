@@ -40,6 +40,9 @@ public class Presentation {
 	public void setTo(String to) {
 		this.to = to;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "Presentation [iD=" + iD + ", day=" + day + ", from=" + from + ", to=" + to + "]";
+	}
 }

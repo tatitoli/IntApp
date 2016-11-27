@@ -15,7 +15,7 @@ public class PresentationProblem implements Problem{
 		operators = new HashSet<>();
 		operators.add( new PresentationOperator(2,"7:00","8:00",1) );
 		operators.add( new PresentationOperator(2,"10:00","10:30",1) );
-		operators.add( new PresentationOperator(3,"11:00","12:00",1) );
+		operators.add( new PresentationOperator(3,"10:00","12:00",1) );
 		operators.add( new PresentationOperator(4,"12:00","13:00",2) );
 		operators.add( new PresentationOperator(6,"19:00","20:00",1) );
 		operators.add( new PresentationOperator(5,"17:00","18:00",2) );
