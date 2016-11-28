@@ -60,12 +60,12 @@ public class Algorythm{
 				Operator op = actNode.unused.removeFirst();
 				State newState = op.apply(actNode.state, op);
 				boolean found = false;
-				for (Node node : actPath){
-					if (node.state.equals(newState)) {
-						found = true;
-						break;
-					}
-				}
+//				for (Node node : actPath){
+//					if (node.state.equals(newState)) {
+//						found = true;
+//						break;
+//					}
+//				}
 				if (!found) {
 					actPath.addLast(new Node(newState, op, p.operators(),actNode));
 				}

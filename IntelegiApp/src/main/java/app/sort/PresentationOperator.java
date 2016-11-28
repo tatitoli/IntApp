@@ -41,7 +41,6 @@ public class PresentationOperator implements Operator {
 	@Override
 	public boolean isApplicable(State s, Operator o) {
 		DateFormat formatter = new SimpleDateFormat(FORMAT);
-		List<Integer> typeList = new ArrayList<>();
 		Date toDateOperator = null;
 		Date toDatePresentation = null;
 		Date fromDateOperator = null;
@@ -65,16 +64,10 @@ public class PresentationOperator implements Operator {
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
-				// Timestamp fromOp = new Timestamp(fromDateOperator.getTime());
-				// Timestamp fromPe = new
-				// Timestamp(fromDatePresentation.getTime());
-				// Timestamp toOp = new Timestamp(toDateOperator.getTime());
-				// Timestamp toPe = new Timestamp(toDatePresentation.getTime());
-				// if(fromDatePresentation.getTime() <=
-				// fromDateOperator.getTime() && toDatePresentation.getTime()
-				// > toDateOperator.getTime()){
-				// return false;
-				// }
+				 if(fromDateOperator.getTime() == fromDatePresentation.getTime() 
+						 || toDateOperator.getTime() == toDatePresentation.getTime()){
+					 return false;
+				 }
 			}
 		}
 		return true;
@@ -90,6 +83,7 @@ public class PresentationOperator implements Operator {
 
 	@Override
 	public State apply(State s, Operator o) {
+		boolean canIns = true;
 		PresentationState state = (PresentationState) s;
 		Map<Integer, Integer> costByDay = new HashMap<>();
 		PresentationOperator operator = (PresentationOperator) o;
@@ -98,6 +92,7 @@ public class PresentationOperator implements Operator {
 		List<Presentation> presentations = new ArrayList<>();
 		actualEvent = state.getEvent();
 		int cost = 0;
+		canIns = checkDate(actualEvent, operator);
 		List<Integer> typeList = new ArrayList<>();
 		if (idPerDay.containsKey(operator.id)) {
 			presentations = actualEvent.get(idPerDay.get(operator.id));
@@ -120,17 +115,17 @@ public class PresentationOperator implements Operator {
 				}
 			}
 			presentations = actualEvent.get(idPerDay.get(operator.id));
-			if ((costByDay.get(idPerDay.get(operator.id)) >= cost)) {
+			if ((costByDay.get(idPerDay.get(operator.id)) >= cost) && canIns) {
 				presentations.remove(actPresentation);
 				actualEvent.put(idPerDay.get(operator.id), presentations);
 			}
 		}
-		if (actualEvent.containsKey(operator.getDay())) {
+		if (actualEvent.containsKey(operator.getDay()) && canIns) {
 			presentations = actualEvent.get(operator.day);
 			presentations.add(
 					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));
 			actualEvent.put(operator.day, presentations);
-		} else {
+		} else if(canIns){
 			presentations = new ArrayList<>();
 			presentations.add(
 					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));
@@ -165,6 +160,35 @@ public class PresentationOperator implements Operator {
 		}
 		return costByDay;
 	}
+	
+	private boolean checkDate(Map<Integer, List<Presentation>> actualEvent, PresentationOperator operator){
+		DateFormat formatter = new SimpleDateFormat(FORMAT);
+		Date toDateOperator = null;
+		Date toDatePresentation = null;
+		Date fromDateOperator = null;
+		Date fromDatePresentation = null;
+		List<Presentation> presentations = new ArrayList<>();
+		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
+			presentations = entry.getValue();
+			for (int i = 0; i < presentations.size(); i++) {
+				try {
+					fromDateOperator = formatter.parse(operator.fromTime);
+					fromDatePresentation = formatter.parse(presentations.get(i).getFrom());
+					toDateOperator = formatter.parse(operator.toTime);
+					toDatePresentation = formatter.parse(presentations.get(i).getTo());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				 if(fromDateOperator.getTime() == fromDatePresentation.getTime() 
+						 || toDateOperator.getTime() == toDatePresentation.getTime()){
+					 return false;
+				 }
+			}
+		}
+		return true;
+	}
+	
+	
 
 	@Override
 	public String toString() {

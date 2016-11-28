@@ -14,25 +14,25 @@ public class PresentationProblem implements Problem {
 	List<Integer> presentationIds = new ArrayList<>();
 
 	public PresentationProblem() {
-		operators = new HashSet<>();
-		operators.add(new PresentationOperator(2, "10:00", "10:00", 1, 1));
-		operators.add(new PresentationOperator(1, "10:00", "10:30", 1, 1));
-		operators.add(new PresentationOperator(1, "10:00", "10:30", 2, 1));
-		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 1));
-		operators.add(new PresentationOperator(4, "10:00", "10:00", 3, 3));
-		operators.add(new PresentationOperator(8, "10:00", "10:00", 1, 2));
-		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 2));
-		operators.add(new PresentationOperator(7, "10:00", "10:00", 2, 2));
-		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 2));
-		operators.add(new PresentationOperator(6, "10:00", "10:00", 3, 2));
-		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 2));
+//		operators = new HashSet<>();
+//		operators.add(new PresentationOperator(2, "8:00", "9:00", 1, 1));
+//		operators.add(new PresentationOperator(1, "9:00", "10:00", 1, 1));
+//		operators.add(new PresentationOperator(1, "10:00", "10:30", 2, 1));
+//		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 1));
+//		operators.add(new PresentationOperator(4, "11:00", "12:00", 3, 3));
+//		operators.add(new PresentationOperator(8, "12:00", "13:00", 1, 2));
+//		operators.add(new PresentationOperator(3, "10:00", "11:00", 1, 2));
+//		operators.add(new PresentationOperator(7, "13:00", "14:00", 2, 2));
+//		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 2));
+//		operators.add(new PresentationOperator(6, "14:00", "15:00", 3, 2));
+//		operators.add(new PresentationOperator(3, "10:00", "10:00", 1, 2));
 
-		for (Operator o : operators) {
-			PresentationOperator operator = (PresentationOperator) o;
-			if (!presentationIds.contains(operator.id)) {
-				presentationIds.add(operator.id);
-			}
-		}
+//		for (Operator o : operators) {
+//			PresentationOperator operator = (PresentationOperator) o;
+//			if (!presentationIds.contains(operator.id)) {
+//				presentationIds.add(operator.id);
+//			}
+//		}
 	}
 
 	@Override
@@ -46,6 +46,12 @@ public class PresentationProblem implements Problem {
 	}
 
 	public List<Integer> getPresentationIds() {
+		for (Operator o : operators) {
+			PresentationOperator operator = (PresentationOperator) o;
+			if (!presentationIds.contains(operator.id)) {
+				presentationIds.add(operator.id);
+			}
+		}
 		return presentationIds;
 	}
 
@@ -72,5 +78,13 @@ public class PresentationProblem implements Problem {
 			return typeList.size();
 		}
 		return 0;
+	}
+
+	public static Set<Operator> getOperators() {
+		return operators;
+	}
+
+	public static void setOperators(Set<Operator> operators) {
+		PresentationProblem.operators = operators;
 	}
 }
