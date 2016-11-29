@@ -83,49 +83,49 @@ public class PresentationOperator implements Operator {
 
 	@Override
 	public State apply(State s, Operator o) {
-		boolean canIns = true;
+//		boolean canIns = true;
 		PresentationState state = (PresentationState) s;
-		Map<Integer, Integer> costByDay = new HashMap<>();
+//		Map<Integer, Integer> costByDay = new HashMap<>();
 		PresentationOperator operator = (PresentationOperator) o;
-		costByDay = getCostByDay(state, operator);
+//		costByDay = getCostByDay(state, operator);
 		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
 		List<Presentation> presentations = new ArrayList<>();
 		actualEvent = state.getEvent();
-		int cost = 0;
-		canIns = checkDate(actualEvent, operator);
-		List<Integer> typeList = new ArrayList<>();
-		if (idPerDay.containsKey(operator.id)) {
-			presentations = actualEvent.get(idPerDay.get(operator.id));
-			typeList.add(operator.topic);
-			Presentation actPresentation = null;
-			for (int i = 0; i < presentations.size(); i++) {
-				if (presentations.get(i).getiD() == operator.id) {
-					actPresentation = presentations.get(i);
-				}
-			}
-			presentations = actualEvent.get(operator.day);
-			if (presentations != null) {
-				for (int i = 0; i < presentations.size(); i++) {
-					if (!typeList.contains(presentations.get(i).getTopic())) {
-						typeList.add(presentations.get(i).getTopic());
-					}
-				}
-				if (typeList != null) {
-					cost = typeList.size();
-				}
-			}
-			presentations = actualEvent.get(idPerDay.get(operator.id));
-			if ((costByDay.get(idPerDay.get(operator.id)) >= cost) && canIns) {
-				presentations.remove(actPresentation);
-				actualEvent.put(idPerDay.get(operator.id), presentations);
-			}
-		}
-		if (actualEvent.containsKey(operator.getDay()) && canIns) {
+//		int cost = 0;
+//		canIns = checkDate(actualEvent, operator);
+//		List<Integer> typeList = new ArrayList<>();
+//		if (idPerDay.containsKey(operator.id)) {
+//			presentations = actualEvent.get(idPerDay.get(operator.id));
+//			typeList.add(operator.topic);
+//			Presentation actPresentation = null;
+//			for (int i = 0; i < presentations.size(); i++) {
+//				if (presentations.get(i).getiD() == operator.id) {
+//					actPresentation = presentations.get(i);
+//				}
+//			}
+//			presentations = actualEvent.get(operator.day);
+//			if (presentations != null) {
+//				for (int i = 0; i < presentations.size(); i++) {
+//					if (!typeList.contains(presentations.get(i).getTopic())) {
+//						typeList.add(presentations.get(i).getTopic());
+//					}
+//				}
+//				if (typeList != null) {
+//					cost = typeList.size();
+//				}
+//			}
+//			presentations = actualEvent.get(idPerDay.get(operator.id));
+//			if ((costByDay.get(idPerDay.get(operator.id)) >= cost) && canIns) {
+//				presentations.remove(actPresentation);
+//				actualEvent.put(idPerDay.get(operator.id), presentations);
+//			}
+//		}
+		if (actualEvent.containsKey(operator.getDay())) {
 			presentations = actualEvent.get(operator.day);
 			presentations.add(
 					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));
 			actualEvent.put(operator.day, presentations);
-		} else if(canIns){
+		} else{
 			presentations = new ArrayList<>();
 			presentations.add(
 					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));

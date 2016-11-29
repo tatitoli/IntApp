@@ -8,6 +8,7 @@ import java.util.Set;
 import app.daoimp.PresentationsDaoImp;
 import app.sort.Algorythm;
 import app.sort.Operator;
+import app.sort.Optimal;
 import app.sort.PresentationProblem;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -56,8 +57,8 @@ public class MainForm extends Application {
 		operators = impDao.readPresentations();
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
-		Algorythm algorithm = new Algorythm(problem);
-//		Optimal algorithm=new Optimal(problem);
+//		Algorythm algorithm = new Algorythm(problem);
+		Optimal algorithm = new Optimal(problem);
 		boolean run = algorithm.run();
 		if(run == false){
 			System.out.println("Nem lehet beosztani az elõadásokat!");
