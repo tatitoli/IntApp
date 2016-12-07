@@ -1,17 +1,16 @@
 package app.sort;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 public class PresentationState implements State {
 
-	Map<Integer,List<Presentation>> event = new HashMap<>();
+	Presentation[][] table = new Presentation[3][10];
 
 	public PresentationState() {
+		table = new Presentation[3][10];
 	}
-	
+
 	@Override
 	public boolean isGoal() {
 		return false;
@@ -19,46 +18,44 @@ public class PresentationState implements State {
 
 	@Override
 	public String toString() {
-		return "PresentationState [event=" + event + "]";
+		return "PresentationState [table=" + Arrays.toString(table) + "]";
 	}
 
 	@Override
 	public boolean isGoal(Problem p) {
-		PresentationProblem problem = (PresentationProblem)p;
-		ArrayList<Integer> pIds =  (ArrayList<Integer>) problem.getPresentationIds();
-		ArrayList<Integer> actualId =  new ArrayList<>();
-		List<Presentation> presentations;
-		for (Map.Entry<Integer, List<Presentation>> entry : event.entrySet())
-		{
-			presentations = entry.getValue();
-			for(int i=0; i < presentations.size(); i++){
-				if(pIds.contains(presentations.get(i).getiD())){
-					actualId.add(presentations.get(i).getiD());
+		PresentationProblem problem = (PresentationProblem) p;
+		ArrayList<String> pIds = (ArrayList<String>) problem.getPresentationIds();
+		ArrayList<String> actualId = new ArrayList<>();
+		Presentation tabla[][] = getTable();
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != null && pIds.contains(tabla[i][j].getPresentationTitle())) {
+					actualId.add(tabla[i][j].getPresentationTitle());
 				}
 			}
 		}
 		return actualId.containsAll(pIds);
 	}
-	
-	public String getGoal(){
+
+	public String getGoal() {
 		StringBuilder sb = new StringBuilder();
-		List<Presentation> presentations;
-		for (Map.Entry<Integer, List<Presentation>> entry : event.entrySet())
-		{
-			presentations = entry.getValue();
-			for(int i=0; i < presentations.size(); i++){
-				sb.append(presentations.get(i).toString());
+		Presentation tabla[][] = getTable();
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != null) {
+					sb.append(tabla[i][j].toString());
+				}
 			}
 			sb.append("\n");
 		}
 		return sb.toString();
 	}
 
-	public Map<Integer, List<Presentation>> getEvent() {
-		return event;
+	public Presentation[][] getTable() {
+		return table;
 	}
 
-	public void setEvent(Map<Integer, List<Presentation>> event) {
-		this.event = event;
+	public void setTable(Presentation[][] table) {
+		this.table = table;
 	}
 }

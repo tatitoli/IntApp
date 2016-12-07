@@ -44,7 +44,6 @@ public class Optimal {
         closedNodes = new LinkedList<>();
         openNodes = new LinkedList<>();
         openNodes.add(new Node(p.startState(), null, null));
-
         while (true) {
             if (openNodes.isEmpty()) {
                 return false;
@@ -58,14 +57,10 @@ public class Optimal {
             closedNodes.add(node);
             for (Operator op : p.operators()) {
                 if (op.isApplicable(node.state,op)) {
-                    State newState = op.apply(node.state, op);
-//                    if (search(openNodes, newState) != null) {
-//                        frissithajobb(node, op, newState);//megkapja a szülõ csúcsot, az elõálíító operátort
-//                        // és hogy melyik állapot ált elõ
-//                    }
-//                    if (search(closedNodes, newState) != null) {
-//                        continue;
-//                    }
+                    State newState = op.apply(node.state, op);        
+                    if (search(closedNodes, newState) != null) {
+                        continue;
+                    }
                     openNodes.addLast(new Node(newState, op, node));
                 }
             }
@@ -98,36 +93,16 @@ public class Optimal {
         }
         return null;
     }
-
-//    void frissithajobb(Node parentNode, Operator op, State s) {
-//        int k=0;//ha jobb utat találtam ugyanahoz a csúcshoz akkor a listában felülírom azt a csúcsot
-//        //órai jegyzetemben úgy van hogy módosítjuk az elõállító operátorát és a szülõét 
-//        // költséget meg a konstruktór úgy is újraszámolja, szóval nekem így átláthatóbb
-//        for (Iterator<Node> it = openNodes.iterator(); it.hasNext();) {
-//            Node n = it.next();
-//            if (n.state.equals(parentNode.state) && n.roadCost > parentNode.roadCost + p.cost(op, parentNode.state)) {
-//                it.remove();
-//                openNodes.add(k,new Node(s, op, parentNode));k++;
-//                
-//            }
-//
-//        }
-//    }
-   
     
     private static int getCost(State state){
-    	List<Integer> typeList = new ArrayList<>();
+    	List<String> typeList = new ArrayList<>();
 		PresentationState s = (PresentationState) state;
-		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
-		List<Presentation> presentations = new ArrayList<>();
 		int db = 0;
-		actualEvent = s.getEvent();
-		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
-			presentations = entry.getValue();
-			typeList = new ArrayList<>();
-			for (int i = 0; i < presentations.size(); i++) {
-				if (!typeList.contains(presentations.get(i).getTopic())) {
-					typeList.add(presentations.get(i).getTopic());
+		Presentation tabla[][] = s.getTable();
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
+					typeList.add(tabla[i][j].getTopic());
 				}
 			}
 			if(typeList!= null){
@@ -137,6 +112,21 @@ public class Optimal {
 				db = 0;
 			}
 		}
+//		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
+//			presentations = entry.getValue();
+//			typeList = new ArrayList<>();
+//			for (int i = 0; i < presentations.size(); i++) {
+//				if (!typeList.contains(presentations.get(i).getTopic())) {
+//					typeList.add(presentations.get(i).getTopic());
+//				}
+//			}
+//			if(typeList!= null){
+//				db += typeList.size()-1;
+//			}
+//			if(db<0){
+//				db = 0;
+//			}
+//		}
 		return db;
     }
     

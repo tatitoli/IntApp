@@ -54,7 +54,7 @@ public class MainForm extends Application {
 //		launch(args);
 		PresentationsDaoImp impDao = new PresentationsDaoImp();
 		Set<Operator> operators = new HashSet<>();
-		operators = impDao.readPresentations();
+		operators = impDao.getPresentations();
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
 //		Algorythm algorithm = new Algorythm(problem);

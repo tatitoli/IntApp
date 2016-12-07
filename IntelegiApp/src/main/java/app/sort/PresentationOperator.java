@@ -11,21 +11,21 @@ import java.util.Map;
 
 public class PresentationOperator implements Operator {
 
-	Map<Integer, Integer> idPerDay = new HashMap<>();
 	final String FORMAT = "mm:ss";
 
-	int id;
-	String fromTime;
-	String toTime;
-	int day;
-	int topic;
+	private String presentationTitle;
+	private String actor;
+	private String topic;
+	private String from;
+	private String to;
 
-	public PresentationOperator(int id, String fromTime, String toTime, int day, int topic) {
-		this.id = id;
-		this.fromTime = fromTime;
-		this.toTime = toTime;
-		this.day = day;
+	public PresentationOperator(String presentationTitle, String actor, String topic, String from, String to) {
+		super();
+		this.presentationTitle = presentationTitle;
+		this.actor = actor;
 		this.topic = topic;
+		this.from = from;
+		this.to = to;
 	}
 
 	@Override
@@ -47,152 +47,120 @@ public class PresentationOperator implements Operator {
 		Date fromDatePresentation = null;
 		PresentationState state = (PresentationState) s;
 		PresentationOperator operator = (PresentationOperator) o;
-		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
-		List<Presentation> presentations = new ArrayList<>();
-		actualEvent = state.getEvent();
-		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
-			presentations = entry.getValue();
-			for (int i = 0; i < presentations.size(); i++) {
-				if (presentations.get(i).getiD() == operator.id) {
+		Presentation tabla[][] = state.getTable();
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != null && tabla[i][j].getPresentationTitle() == operator.getPresentationTitle()) {
 					return false;
 				}
-				try {
-					fromDateOperator = formatter.parse(operator.fromTime);
-					fromDatePresentation = formatter.parse(presentations.get(i).getFrom());
-					toDateOperator = formatter.parse(operator.toTime);
-					toDatePresentation = formatter.parse(presentations.get(i).getTo());
-				} catch (ParseException e) {
-					e.printStackTrace();
+				if (tabla[i][j] != null) {
+					try {
+						fromDateOperator = formatter.parse(operator.getFrom());
+						fromDatePresentation = formatter.parse(tabla[i][j].getFrom());
+						toDateOperator = formatter.parse(operator.getTo());
+						toDatePresentation = formatter.parse(tabla[i][j].getTo());
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					if (fromDateOperator.getTime() == fromDatePresentation.getTime()
+							|| toDateOperator.getTime() == toDatePresentation.getTime()) {
+						return false;
+					}
 				}
-				 if(fromDateOperator.getTime() == fromDatePresentation.getTime() 
-						 || toDateOperator.getTime() == toDatePresentation.getTime()){
-					 return false;
-				 }
 			}
 		}
 		return true;
-	}
-
-	public int getDay() {
-		return day;
-	}
-
-	public void setDay(int day) {
-		this.day = day;
 	}
 
 	@Override
 	public State apply(State s, Operator o) {
-//		boolean canIns = true;
+		boolean add = false;
 		PresentationState state = (PresentationState) s;
-//		Map<Integer, Integer> costByDay = new HashMap<>();
 		PresentationOperator operator = (PresentationOperator) o;
-//		costByDay = getCostByDay(state, operator);
-		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
-		List<Presentation> presentations = new ArrayList<>();
-		actualEvent = state.getEvent();
-//		int cost = 0;
-//		canIns = checkDate(actualEvent, operator);
-//		List<Integer> typeList = new ArrayList<>();
-//		if (idPerDay.containsKey(operator.id)) {
-//			presentations = actualEvent.get(idPerDay.get(operator.id));
-//			typeList.add(operator.topic);
-//			Presentation actPresentation = null;
-//			for (int i = 0; i < presentations.size(); i++) {
-//				if (presentations.get(i).getiD() == operator.id) {
-//					actPresentation = presentations.get(i);
-//				}
-//			}
-//			presentations = actualEvent.get(operator.day);
-//			if (presentations != null) {
-//				for (int i = 0; i < presentations.size(); i++) {
-//					if (!typeList.contains(presentations.get(i).getTopic())) {
-//						typeList.add(presentations.get(i).getTopic());
-//					}
-//				}
-//				if (typeList != null) {
-//					cost = typeList.size();
-//				}
-//			}
-//			presentations = actualEvent.get(idPerDay.get(operator.id));
-//			if ((costByDay.get(idPerDay.get(operator.id)) >= cost) && canIns) {
-//				presentations.remove(actPresentation);
-//				actualEvent.put(idPerDay.get(operator.id), presentations);
-//			}
-//		}
-		if (actualEvent.containsKey(operator.getDay())) {
-			presentations = actualEvent.get(operator.day);
-			presentations.add(
-					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));
-			actualEvent.put(operator.day, presentations);
-		} else{
-			presentations = new ArrayList<>();
-			presentations.add(
-					new Presentation(operator.id, operator.day, operator.fromTime, operator.toTime, operator.topic));
-			actualEvent.put(operator.day, presentations);
+		Presentation tabla[][] = state.getTable();
+		int index = getLowIndex(state, operator);
+		for(int i = 0;i<tabla[index].length;i++){
+			if (tabla[index][i] == null) {
+					tabla[index][i] = new Presentation(operator.getPresentationTitle(), operator.getActor(), operator.getTopic(), operator.getFrom(), operator.getTo());
+					add = true;
+					break;
+			}
 		}
 		PresentationState newState = new PresentationState();
-		newState.setEvent(actualEvent);
+		newState.setTable(tabla);
 		return newState;
 	}
 
-	private Map<Integer, Integer> getCostByDay(State s, Operator o) {
-		Map<Integer, Integer> costByDay = new HashMap<>();
-		idPerDay = new HashMap<>();
-		PresentationState state = (PresentationState) s;
-		PresentationOperator operator = (PresentationOperator) o;
-		Map<Integer, List<Presentation>> actualEvent = new HashMap<>();
-		List<Presentation> presentations = new ArrayList<>();
-		actualEvent = state.getEvent();
-		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
-			List<Integer> typeList = new ArrayList<>();
-			int day = entry.getKey();
-			presentations = entry.getValue();
-			for (Presentation presentation : presentations) {
-				if (!typeList.contains(presentation.getTopic())) {
-					typeList.add(presentation.getTopic());
-				}
-				if (operator.id == presentation.getiD()) {
-					idPerDay.put(presentation.getiD(), day);
-				}
-			}
-			costByDay.put(day, typeList.size());
-		}
-		return costByDay;
-	}
-	
-	private boolean checkDate(Map<Integer, List<Presentation>> actualEvent, PresentationOperator operator){
-		DateFormat formatter = new SimpleDateFormat(FORMAT);
-		Date toDateOperator = null;
-		Date toDatePresentation = null;
-		Date fromDateOperator = null;
-		Date fromDatePresentation = null;
-		List<Presentation> presentations = new ArrayList<>();
-		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
-			presentations = entry.getValue();
-			for (int i = 0; i < presentations.size(); i++) {
-				try {
-					fromDateOperator = formatter.parse(operator.fromTime);
-					fromDatePresentation = formatter.parse(presentations.get(i).getFrom());
-					toDateOperator = formatter.parse(operator.toTime);
-					toDatePresentation = formatter.parse(presentations.get(i).getTo());
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-				 if(fromDateOperator.getTime() == fromDatePresentation.getTime() 
-						 || toDateOperator.getTime() == toDatePresentation.getTime()){
-					 return false;
-				 }
-			}
-		}
-		return true;
-	}
-	
-	
-
 	@Override
 	public String toString() {
-		return "PresentationOperator [id=" + id + ", fromTime=" + fromTime + ", toTime=" + toTime + ", day=" + day
-				+ "]";
+		return "PresentationOperator [presentationTitle=" + presentationTitle + ", actor=" + actor + ", topic=" + topic
+				+ ", from=" + from + ", to=" + to + "]";
 	}
+
+	public int getLowIndex(PresentationState state, PresentationOperator operator){
+		List<String> typeList = new ArrayList<>();
+		int maxCost = Integer.MAX_VALUE;
+		int db = 0;
+		int index = 0;
+		Presentation tabla[][] = state.getTable();
+		for (int i = 0; i < tabla.length; i++) {
+			db = 0;
+			typeList = new ArrayList<>();
+			typeList.add(operator.getTopic());
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
+					typeList.add(tabla[i][j].getTopic());
+				}
+			}
+			db = typeList.size();
+			if(db<0){
+				db = 0;
+			}
+			if(db < maxCost){
+				maxCost = db;
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	public String getPresentationTitle() {
+		return presentationTitle;
+	}
+
+	public void setPresentationTitle(String presentationTitle) {
+		this.presentationTitle = presentationTitle;
+	}
+
+	public String getActor() {
+		return actor;
+	}
+
+	public void setActor(String actor) {
+		this.actor = actor;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}	
 }
