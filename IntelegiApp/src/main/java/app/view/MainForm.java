@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import app.daoimp.PresentationsDaoImp;
-import app.sort.Algorythm;
 import app.sort.Operator;
 import app.sort.Optimal;
 import app.sort.PresentationProblem;
@@ -25,14 +24,32 @@ public class MainForm extends Application {
 
 	@FXML
 	Button fileButton;
+	
+	@FXML
+	Button generateButton;
 
 	@FXML
 	public void addFileAction(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-		fileChooser.getExtensionFilters().add(extFilter);
-		File file = fileChooser.showOpenDialog(stage);
-		System.out.println(file);
+		fileChooser.setTitle("Open Resource File");
+		File selectedFile = fileChooser.showOpenDialog(stage);
+		System.out.println(selectedFile);
+		PresentationsDaoImp impDao = new PresentationsDaoImp();
+		Set<Operator> operators = new HashSet<>();
+		operators = impDao.getPresentations(selectedFile);
+		PresentationProblem problem = new PresentationProblem();
+		PresentationProblem.setOperators(operators);
+		Optimal algorithm = new Optimal(problem);
+		boolean run = algorithm.run();
+		if(run == false){
+			System.out.println("Nem lehet beosztani az elõadásokat!");
+		}
+		System.out.println(algorithm.getGoal());
+	}
+	
+	@FXML
+	public void generateAction(ActionEvent event) {
+		
 	}
 
 	@Override
@@ -50,18 +67,17 @@ public class MainForm extends Application {
 	}
 
 	public static void main(String[] args) {
-//		launch(args);
-		PresentationsDaoImp impDao = new PresentationsDaoImp();
-		Set<Operator> operators = new HashSet<>();
-		operators = impDao.getPresentations();
-		PresentationProblem problem = new PresentationProblem();
-		PresentationProblem.setOperators(operators);
-//		Algorythm algorithm = new Algorythm(problem);
-		Optimal algorithm = new Optimal(problem);
-		boolean run = algorithm.run();
-		if(run == false){
-			System.out.println("Nem lehet beosztani az elõadásokat!");
-		}
-		System.out.println(algorithm.getGoal());
+		launch(args);
+//		PresentationsDaoImp impDao = new PresentationsDaoImp();
+//		Set<Operator> operators = new HashSet<>();
+//		operators = impDao.getPresentations();
+//		PresentationProblem problem = new PresentationProblem();
+//		PresentationProblem.setOperators(operators);
+//		Optimal algorithm = new Optimal(problem);
+//		boolean run = algorithm.run();
+//		if(run == false){
+//			System.out.println("Nem lehet beosztani az elõadásokat!");
+//		}
+//		System.out.println(algorithm.getGoal());
 	}
 }

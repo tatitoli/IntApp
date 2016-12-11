@@ -1,5 +1,6 @@
 package app.dao;
 
+import java.io.File;
 import java.util.Set;
 
 import app.model.Section;
@@ -14,4 +15,6 @@ public interface PresentationsDao {
 	Section getSection();
 	
 	void writePresentations();
+
+	Set<Operator> getPresentations(File file);
 }
