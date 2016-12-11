@@ -19,13 +19,18 @@ public class Optimal {
         int cost;
 
         public Node(State state, Operator op, Node parent) {
-            this.cost = parent == null ? 0 : getCost(state);
+            this.cost = parent == null ? 0 : parent.cost + getCost(state) + getWightPay(op);
             this.op = op;
             this.parent = parent;
             this.state = state;
         }
 
-        @Override
+        private int getWightPay(Operator op) {
+        	PresentationOperator operator = (PresentationOperator)op;
+			return 100 - operator.getWight();
+		}
+
+		@Override
         public String toString() {
             return state.toString();
         }
@@ -56,6 +61,12 @@ public class Optimal {
          
             closedNodes.add(node);
             for (Operator op : p.operators()) {
+            	PresentationOperator operator = (PresentationOperator)op;
+            	if(operator.isPiority() == true){
+            		if (!op.isApplicable(node.state,op)) {
+            			break;
+            		}
+            	}
                 if (op.isApplicable(node.state,op)) {
                     State newState = op.apply(node.state, op);        
                     if (search(closedNodes, newState) != null) {
@@ -112,21 +123,6 @@ public class Optimal {
 				db = 0;
 			}
 		}
-//		for (Map.Entry<Integer, List<Presentation>> entry : actualEvent.entrySet()) {
-//			presentations = entry.getValue();
-//			typeList = new ArrayList<>();
-//			for (int i = 0; i < presentations.size(); i++) {
-//				if (!typeList.contains(presentations.get(i).getTopic())) {
-//					typeList.add(presentations.get(i).getTopic());
-//				}
-//			}
-//			if(typeList!= null){
-//				db += typeList.size()-1;
-//			}
-//			if(db<0){
-//				db = 0;
-//			}
-//		}
 		return db;
     }
     

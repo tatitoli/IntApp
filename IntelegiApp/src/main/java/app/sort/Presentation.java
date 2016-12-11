@@ -6,18 +6,22 @@ public class Presentation {
 	private String topic;
 	private String from;
 	private String to;
+	private boolean poirity;
+	private int weight;
 	
 	public Presentation(){
 		
 	}
 
-	public Presentation(String presentationTitle, String actor, String topic, String from, String to) {
+	public Presentation(String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight) {
 		super();
 		this.presentationTitle = presentationTitle;
 		this.actor = actor;
 		this.topic = topic;
 		this.from = from;
 		this.to = to;
+		this.poirity = piority;
+		this.weight = weight;
 	}
 
 	public String getFrom() {
@@ -58,6 +62,22 @@ public class Presentation {
 
 	public void setTopic(String topic) {
 		this.topic = topic;
+	}
+
+	public boolean isPoirity() {
+		return poirity;
+	}
+
+	public void setPoirity(boolean poirity) {
+		this.poirity = poirity;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
 	}
 
 	@Override

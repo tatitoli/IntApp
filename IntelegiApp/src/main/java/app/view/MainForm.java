@@ -1,6 +1,5 @@
 package app.view;
 
-import java.awt.List;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
