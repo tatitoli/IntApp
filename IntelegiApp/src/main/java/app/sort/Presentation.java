@@ -24,6 +24,61 @@ public class Presentation {
 		this.weight = weight;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((actor == null) ? 0 : actor.hashCode());
+		result = prime * result + ((from == null) ? 0 : from.hashCode());
+		result = prime * result + (poirity ? 1231 : 1237);
+		result = prime * result + ((presentationTitle == null) ? 0 : presentationTitle.hashCode());
+		result = prime * result + ((to == null) ? 0 : to.hashCode());
+		result = prime * result + ((topic == null) ? 0 : topic.hashCode());
+		result = prime * result + weight;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Presentation other = (Presentation) obj;
+		if (actor == null) {
+			if (other.actor != null)
+				return false;
+		} else if (!actor.equals(other.actor))
+			return false;
+		if (from == null) {
+			if (other.from != null)
+				return false;
+		} else if (!from.equals(other.from))
+			return false;
+		if (poirity != other.poirity)
+			return false;
+		if (presentationTitle == null) {
+			if (other.presentationTitle != null)
+				return false;
+		} else if (!presentationTitle.equals(other.presentationTitle))
+			return false;
+		if (to == null) {
+			if (other.to != null)
+				return false;
+		} else if (!to.equals(other.to))
+			return false;
+		if (topic == null) {
+			if (other.topic != null)
+				return false;
+		} else if (!topic.equals(other.topic))
+			return false;
+		if (weight != other.weight)
+			return false;
+		return true;
+	}
+
 	public String getFrom() {
 		return from;
 	}

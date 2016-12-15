@@ -4,37 +4,10 @@
  */
 package app.sort;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class Optimal {
-
-    private static class Node {
-        State state;
-        Operator op;
-        Node parent;
-        int cost;
-
-        public Node(State state, Operator op, Node parent) {
-            this.cost = parent == null ? 0 : parent.cost + getCost(state) + getWightPay(op);
-            this.op = op;
-            this.parent = parent;
-            this.state = state;
-        }
-
-        private int getWightPay(Operator op) {
-        	PresentationOperator operator = (PresentationOperator)op;
-			return 100 - operator.getWight();
-		}
-
-		@Override
-        public String toString() {
-            return state.toString();
-        }
-    }
     
     Problem p;
     Problem seged;
@@ -68,15 +41,13 @@ public class Optimal {
             		}
             	}
                 if (op.isApplicable(node.state,op)) {
-                    State newState = op.apply(node.state, op);        
+                    State newState = op.apply(node.state, op, closedNodes);        
                     if (search(closedNodes, newState) != null) {
                         continue;
                     }
                     openNodes.addLast(new Node(newState, op, node));
                 }
             }
-
-
         }
     }
 
@@ -86,7 +57,7 @@ public class Optimal {
 		int stateCost = 0;
 		for (Node node : openNodes) {
 			PresentationState state = (PresentationState) node.state;
-			stateCost = getCost(state);
+			stateCost = Node.getCost(state);
 			if(cost > stateCost){
 				cost = stateCost;
 				index = i;
@@ -103,27 +74,6 @@ public class Optimal {
             }
         }
         return null;
-    }
-    
-    private static int getCost(State state){
-    	List<String> typeList = new ArrayList<>();
-		PresentationState s = (PresentationState) state;
-		int db = 0;
-		Presentation tabla[][] = s.getTable();
-		for (int i = 0; i < tabla.length; i++) {
-			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
-					typeList.add(tabla[i][j].getTopic());
-				}
-			}
-			if(typeList!= null){
-				db += typeList.size()-1;
-			}
-			if(db<0){
-				db = 0;
-			}
-		}
-		return db;
     }
     
     public String getGoal() {

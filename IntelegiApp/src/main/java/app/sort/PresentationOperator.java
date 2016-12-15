@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PresentationOperator implements Operator {
@@ -257,5 +258,45 @@ public class PresentationOperator implements Operator {
 			}
 		}
 		return index;
+	}
+
+	@Override
+	public State apply(State s, Operator op, LinkedList<app.sort.Node> closedNodes) {
+		PresentationState state = (PresentationState) s;
+		PresentationOperator operator = (PresentationOperator) op;
+		List<Integer> hasIndex = new ArrayList<Integer>(); 
+		Presentation insertPresentation = new Presentation(operator.getPresentationTitle(), operator.getActor(), operator.getTopic(), operator.getFrom(), operator.getTo(), false,15);
+		for (Node node : closedNodes) {
+			PresentationState tempState = (PresentationState) node.getState();
+			Presentation tabla[][] = tempState.getTable();
+			for (int i = 0; i < tabla.length; i++) {
+				if(hasIndex.contains(i)){
+					break;
+				}
+				for (int j = 0; j < tabla[i].length; j++) {
+					if(insertPresentation.equals(tabla[i][j])){
+						hasIndex.add(i);
+						break;
+					}
+				}
+			}
+		}
+		Presentation tabla[][] = state.getTable();
+//		int index = getLowIndex(state, operator);
+//		int index = getInsertIndex(state, operator);
+		for(int i = 0;i<tabla.length;i++){
+			if(!hasIndex.equals(i)){
+				for(int j=0;j<tabla[i].length;j++){
+				if (tabla[i][j] == null) {
+					tabla[i][j] = insertPresentation;
+					break;
+				}
+				
+			}
+		}
+		}
+		PresentationState newState = new PresentationState();
+		newState.setTable(tabla);
+		return newState;
 	}
 }

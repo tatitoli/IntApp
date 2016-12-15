@@ -27,12 +27,14 @@ public class MainForm extends Application {
 	
 	@FXML
 	Button generateButton;
+	
+	private File selectedFile;
 
 	@FXML
 	public void addFileAction(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
-		File selectedFile = fileChooser.showOpenDialog(stage);
+		selectedFile = fileChooser.showOpenDialog(stage);
 		System.out.println(selectedFile);
 		PresentationsDaoImp impDao = new PresentationsDaoImp();
 		Set<Operator> operators = new HashSet<>();

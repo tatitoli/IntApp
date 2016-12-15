@@ -1,5 +1,7 @@
 package app.sort;
 
+import java.util.LinkedList;
+
 public interface Operator {
 
 	boolean isApplicable(State s);
@@ -9,5 +11,7 @@ public interface Operator {
 	boolean isApplicable(State state, Operator o);
 
 	State apply(State state, Operator op);
+
+	State apply(State state, Operator op, LinkedList<Node> closedNodes);
 
 }
