@@ -9,9 +9,9 @@ import java.util.List;
 
 public class Optimal {
     
-    Problem p;
-    Problem seged;
-    public Optimal(Problem p) {
+    PresentationProblem p;
+    PresentationProblem seged;
+    public Optimal(PresentationProblem p) {
         this.p = p;
     }
     private LinkedList<Node> openNodes;
@@ -33,7 +33,7 @@ public class Optimal {
 			}
          
             closedNodes.add(node);
-            for (Operator op : p.operators()) {
+            for (PresentationOperator op : p.operators()) {
             	PresentationOperator operator = (PresentationOperator)op;
             	if(operator.isPiority() == true){
             		if (!op.isApplicable(node.state,op)) {
@@ -41,11 +41,13 @@ public class Optimal {
             		}
             	}
                 if (op.isApplicable(node.state,op)) {
-                    State newState = op.apply(node.state, op, closedNodes);        
+                	PresentationState newState = op.apply(node.state, op, closedNodes);        
                     if (search(closedNodes, newState) != null) {
                         continue;
                     }
-                    openNodes.addLast(new Node(newState, op, node));
+                    Node newNode = null;
+                    newNode = new Node(newState, op, node);
+                    openNodes.addLast(newNode);
                 }
             }
         }
@@ -56,8 +58,9 @@ public class Optimal {
 		int cost = Integer.MAX_VALUE;
 		int stateCost = 0;
 		for (Node node : openNodes) {
-			PresentationState state = (PresentationState) node.state;
-			stateCost = Node.getCost(state);
+//			PresentationState state = (PresentationState) node.state;
+			stateCost = node.getCost();
+//			stateCost = Node.getCost(state);
 			if(cost > stateCost){
 				cost = stateCost;
 				index = i;
@@ -67,7 +70,7 @@ public class Optimal {
 		return index;
 	}
 
-	private Node search(List<Node> nodeList, State state) {
+	private Node search(List<Node> nodeList, PresentationState state) {
         for (Node node : nodeList) {
             if (state.equals(node.state)) {
                 return node;
@@ -78,5 +81,9 @@ public class Optimal {
     
     public String getGoal() {
 		return (String) node.state.getGoal();
+	}
+    
+    public Presentation[][] GetTabla() {
+		return ((PresentationState) node.state).getTable();
 	}
 }

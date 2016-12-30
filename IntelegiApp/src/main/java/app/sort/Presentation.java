@@ -1,6 +1,7 @@
 package app.sort;
 
 public class Presentation {
+	private int id;
 	private String presentationTitle;
 	private String actor;
 	private String topic;
@@ -10,11 +11,11 @@ public class Presentation {
 	private int weight;
 	
 	public Presentation(){
-		
 	}
 
-	public Presentation(String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight) {
+	public Presentation(int id ,String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight) {
 		super();
+		this.id = id;
 		this.presentationTitle = presentationTitle;
 		this.actor = actor;
 		this.topic = topic;
@@ -133,6 +134,14 @@ public class Presentation {
 
 	public void setWeight(int weight) {
 		this.weight = weight;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	@Override

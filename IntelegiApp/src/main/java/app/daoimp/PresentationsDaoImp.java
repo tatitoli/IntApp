@@ -16,13 +16,12 @@ import org.apache.poi.ss.usermodel.Row;
 
 import app.dao.PresentationsDao;
 import app.model.Section;
-import app.sort.Operator;
 import app.sort.PresentationOperator;
 
 public class PresentationsDaoImp implements PresentationsDao {
 
 	@Override
-	public Set<Operator> readPresentations() {
+	public Set<PresentationOperator> readPresentations() {
 		return null;
 	}
 
@@ -32,13 +31,13 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 	
 	@Override
-	public Set<Operator> getPresentations() {
-		Set<Operator> operators = new HashSet<>();
+	public Set<PresentationOperator> getPresentations() {
+		Set<PresentationOperator> operators = new HashSet<>();
 		try {
 			FileInputStream file = new FileInputStream(new File("test.xls"));
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 			HSSFSheet sheet = workbook.getSheetAt(1);
-
+			int i = 0;
 			Iterator<Row> rowIterator = sheet.iterator();
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
@@ -69,7 +68,8 @@ public class PresentationsDaoImp implements PresentationsDao {
 							break;
 						}
 					}
-					operators.add(new PresentationOperator(presentationTitle, actor, topic, from, to, false,15));
+					operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
+					i++;
 				}
 			}
 			file.close();
@@ -82,13 +82,13 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 
 	@Override
-	public Set<Operator> getPresentations(File input) {
-		Set<Operator> operators = new HashSet<>();
+	public Set<PresentationOperator> getPresentations(File input) {
+		Set<PresentationOperator> operators = new HashSet<>();
 		try {
 			FileInputStream file = new FileInputStream(input);
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 			HSSFSheet sheet = workbook.getSheetAt(1);
-
+			int i = 0;
 			Iterator<Row> rowIterator = sheet.iterator();
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
@@ -98,6 +98,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 					String topic = null;
 					String from = null;
 					String to = null;
+					boolean pioritas = false;
 					Iterator<Cell> cellIterator = row.cellIterator();
 					while (cellIterator.hasNext()) {
 						Cell cell = cellIterator.next();
@@ -117,9 +118,15 @@ public class PresentationsDaoImp implements PresentationsDao {
 						case 4:
 							to = new DataFormatter().formatCellValue(cell);
 							break;
+						case 5:
+							if("Igen".equals(new DataFormatter().formatCellValue(cell))){
+								pioritas = true;
+							}
+							break;
 						}
 					}
-					operators.add(new PresentationOperator(presentationTitle, actor, topic, from, to, false,15));
+					operators.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, pioritas,15));
+					i++;
 				}
 			}
 			file.close();
@@ -132,8 +139,43 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 
 	@Override
-	public Section getSection() {
-		// TODO Auto-generated method stub
-		return null;
+	public Section getSection(File input) {
+		Section section = null;
+		try {
+			FileInputStream file = new FileInputStream(input);
+			HSSFWorkbook workbook = new HSSFWorkbook(file);
+			HSSFSheet sheet = workbook.getSheetAt(0);
+			Iterator<Row> rowIterator = sheet.iterator();
+			int sectionNumber = 0;
+			String from = null;
+			String to = null;
+			while (rowIterator.hasNext()) {
+				Row row = rowIterator.next();
+				if (row.getRowNum() > 0) {
+					Iterator<Cell> cellIterator = row.cellIterator();
+					while (cellIterator.hasNext()) {
+						Cell cell = cellIterator.next();
+						switch (cell.getColumnIndex()) {
+						case 0:
+							sectionNumber = (int) cell.getNumericCellValue();
+							break;
+						case 1:
+							from = new DataFormatter().formatCellValue(cell);
+							break;
+						case 2:
+							to = new DataFormatter().formatCellValue(cell);
+							break;
+						}
+					}
+				}
+			}
+			file.close();
+			section = new Section(sectionNumber, from, to);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return section;
 	}
 }

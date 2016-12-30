@@ -3,17 +3,12 @@ package app.sort;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PresentationState implements State {
+public class PresentationState{
 
-	Presentation[][] table = new Presentation[3][10];
+	Presentation[][] table;
 
-	public PresentationState() {
-		table = new Presentation[3][10];
-	}
-
-	@Override
-	public boolean isGoal() {
-		return false;
+	public PresentationState(int x, int y) {
+		table = new Presentation[x][y];
 	}
 
 	@Override
@@ -21,16 +16,14 @@ public class PresentationState implements State {
 		return "PresentationState [table=" + Arrays.toString(table) + "]";
 	}
 
-	@Override
-	public boolean isGoal(Problem p) {
-		PresentationProblem problem = (PresentationProblem) p;
-		ArrayList<String> pIds = (ArrayList<String>) problem.getPresentationIds();
-		ArrayList<String> actualId = new ArrayList<>();
+	public boolean isGoal(PresentationProblem p) {
+		ArrayList<Integer> pIds = (ArrayList<Integer>) p.getPresentationIds();
+		ArrayList<Integer> actualId = new ArrayList<>();
 		Presentation tabla[][] = getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && pIds.contains(tabla[i][j].getPresentationTitle())) {
-					actualId.add(tabla[i][j].getPresentationTitle());
+				if (tabla[i][j] != null && pIds.contains(tabla[i][j].getId())) {
+					actualId.add(tabla[i][j].getId());
 				}
 			}
 		}
@@ -57,5 +50,27 @@ public class PresentationState implements State {
 
 	public void setTable(Presentation[][] table) {
 		this.table = table;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.deepHashCode(table);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PresentationState other = (PresentationState) obj;
+		if (!Arrays.deepEquals(table, other.table))
+			return false;
+		return true;
 	}
 }

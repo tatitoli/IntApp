@@ -4,17 +4,17 @@ import java.io.File;
 import java.util.Set;
 
 import app.model.Section;
-import app.sort.Operator;
+import app.sort.PresentationOperator;
 
 public interface PresentationsDao {
 	
-	Set<Operator> readPresentations();
+	Set<PresentationOperator> readPresentations();
 	
-	Set<Operator> getPresentations();
-	
-	Section getSection();
+	Set<PresentationOperator> getPresentations();
 	
 	void writePresentations();
 
-	Set<Operator> getPresentations(File file);
+	Set<PresentationOperator> getPresentations(File file);
+
+	Section getSection(File input);
 }
