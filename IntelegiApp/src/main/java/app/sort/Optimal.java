@@ -41,7 +41,7 @@ public class Optimal {
             		}
             	}
                 if (op.isApplicable(node.state,op)) {
-                	PresentationState newState = op.apply(node.state, op, closedNodes);        
+                	PresentationState newState = op.apply(node.state, op);        
                     if (search(closedNodes, newState) != null) {
                         continue;
                     }
@@ -58,9 +58,7 @@ public class Optimal {
 		int cost = Integer.MAX_VALUE;
 		int stateCost = 0;
 		for (Node node : openNodes) {
-//			PresentationState state = (PresentationState) node.state;
 			stateCost = node.getCost();
-//			stateCost = Node.getCost(state);
 			if(cost > stateCost){
 				cost = stateCost;
 				index = i;

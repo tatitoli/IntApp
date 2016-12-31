@@ -10,7 +10,7 @@ public class Node {
     int cost;
 
     public Node(PresentationState state, PresentationOperator op, Node parent) {
-        this.cost = parent == null ? 0 : parent.cost + getCost(state) + getWeightPay(op);
+        this.cost = parent == null ? 0 : getCost(state) + getWeightPay(op);
         this.op = op;
         this.parent = parent;
         this.state = state;
@@ -26,12 +26,13 @@ public class Node {
         return state.toString();
     }
 	
-	static int getCost(PresentationState state){
+	static int getCost(PresentationState s){
     	List<String> typeList = new ArrayList<>();
-		PresentationState s = (PresentationState) state;
 		int db = 0;
+		int cost = 0;
 		Presentation tabla[][] = s.getTable();
 		for (int i = 0; i < tabla.length; i++) {
+			db=0;
 			typeList = new ArrayList<>();
 			for (int j = 0; j < tabla[i].length; j++) {
 				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
@@ -39,13 +40,14 @@ public class Node {
 				}
 			}
 			if(typeList!= null){
-				db += typeList.size();
+				db += typeList.size()-1;
 			}
 			if(db<0){
 				db = 0;
 			}
+			cost += db;
 		}
-		return db;
+		return cost;
     }
 
 	public PresentationState getState() {

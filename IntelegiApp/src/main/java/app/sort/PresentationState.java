@@ -11,6 +11,9 @@ public class PresentationState{
 		table = new Presentation[x][y];
 	}
 
+	public PresentationState() {
+	}
+
 	@Override
 	public String toString() {
 		return "PresentationState [table=" + Arrays.toString(table) + "]";

@@ -226,29 +226,29 @@ public class PresentationOperator{
 		return index;
 	}
 
-	public PresentationState apply(PresentationState state, PresentationOperator operator, LinkedList<app.sort.Node> closedNodes) {
+	public PresentationState apply(PresentationState state, PresentationOperator operator) {
 		List<Integer> lista = new ArrayList<>();
 		List<Integer> hasIndex = new ArrayList<Integer>(); 
 		Presentation insertPresentation = new Presentation(operator.getId(), operator.getPresentationTitle(), operator.getActor(), operator.getTopic(), operator.getFrom(), operator.getTo(), operator.isPiority(),operator.getWeight());
-		for (Node node : closedNodes) {
-			PresentationState tempState = (PresentationState) node.getState();
-			Presentation tabla[][] = tempState.getTable();
-			for (int i = 0; i < tabla.length; i++) {
-				for (int j = 0; j < tabla[i].length; j++) {
-					if(insertPresentation.equals(tabla[i][j])){
-						hasIndex.add(i);
-						break;
-					}
-				}
-			}
-		}
+//		for (Node node : closedNodes) {
+//			PresentationState tempState = node.getState();
+//			Presentation tabla[][] = tempState.getTable();
+//			for (int i = 0; i < tabla.length; i++) {
+//				for (int j = 0; j < tabla[i].length; j++) {
+//					if(insertPresentation.equals(tabla[i][j])){
+//						hasIndex.add(i);
+//						break;
+//					}
+//				}
+//			}
+//		}
 		Presentation tabla[][] = state.getTable();
-		for (int i = 0; i < tabla.length; i++) {
-			lista.add(i);
-		}
-		lista.removeAll(hasIndex);
+//		for (int i = 0; i < tabla.length; i++) {
+//			lista.add(i);
+//		}
+//		lista.removeAll(hasIndex);
 		Random randomGenerator = new Random();
-		int randomInt = randomGenerator.nextInt(lista.size());
+		int randomInt = randomGenerator.nextInt(tabla.length);
 //		boolean insert = false;
 //		for (int i = 0; i < tabla.length; i++) {
 //			if (insert) {
@@ -265,14 +265,22 @@ public class PresentationOperator{
 //				}
 //			}
 //		}
-		for (int i = 0; i < tabla[randomInt].length; i++) {
-			if (tabla[randomInt][i] == null) {
-				tabla[randomInt][i] = insertPresentation;
+		Presentation newTabla[][] = new Presentation[tabla.length][tabla[0].length];
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if(tabla[i][j] != null){
+					newTabla[i][j] = tabla[i][j];
+				}
+			}
+		}
+		for (int i = 0; i < newTabla[randomInt].length; i++) {
+			if (newTabla[randomInt][i] == null) {
+				newTabla[randomInt][i] = insertPresentation;
 				break;
 			}
 		}
-		PresentationState newState = new PresentationState(tabla.length, tabla[0].length);
-		newState.setTable(tabla);
+		PresentationState newState = new PresentationState();
+		newState.setTable(newTabla);
 		return newState;
 	}
 
