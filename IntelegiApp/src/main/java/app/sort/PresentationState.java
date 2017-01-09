@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class PresentationState{
 
-	Presentation[][] table;
+	int[][] table;
 
 	public PresentationState(int x, int y) {
-		table = new Presentation[x][y];
+		table = new int[x][y];
 	}
 
 	public PresentationState() {
@@ -22,11 +22,11 @@ public class PresentationState{
 	public boolean isGoal(PresentationProblem p) {
 		ArrayList<Integer> pIds = (ArrayList<Integer>) p.getPresentationIds();
 		ArrayList<Integer> actualId = new ArrayList<>();
-		Presentation tabla[][] = getTable();
+		int tabla[][] = getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && pIds.contains(tabla[i][j].getId())) {
-					actualId.add(tabla[i][j].getId());
+				if (tabla[i][j]!=0 && pIds.contains(tabla[i][j])) {
+					actualId.add(tabla[i][j]);
 				}
 			}
 		}
@@ -35,11 +35,11 @@ public class PresentationState{
 
 	public String getGoal() {
 		StringBuilder sb = new StringBuilder();
-		Presentation tabla[][] = getTable();
+		int tabla[][] = getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null) {
-					sb.append(tabla[i][j].toString());
+				if (tabla[i][j] != 0) {
+					sb.append(String.valueOf(tabla[i][j]));
 				}
 			}
 			sb.append("\n");
@@ -47,11 +47,11 @@ public class PresentationState{
 		return sb.toString();
 	}
 
-	public Presentation[][] getTable() {
+	public int[][] getTable() {
 		return table;
 	}
 
-	public void setTable(Presentation[][] table) {
+	public void setTable(int[][] table) {
 		this.table = table;
 	}
 

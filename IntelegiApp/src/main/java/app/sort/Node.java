@@ -1,17 +1,18 @@
 package app.sort;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Node {
     PresentationState state;
-    PresentationOperator op;
     Node parent;
     int cost;
 
-    public Node(PresentationState state, PresentationOperator op, Node parent) {
-        this.cost = parent == null ? 0 : getCost(state) + getWeightPay(op);
-        this.op = op;
+    public Node(PresentationState state, PresentationOperator op, Node parent, Set<PresentationOperator> operators ) {
+        this.cost = parent == null ? 0 : getCost(state, operators) + getWeightPay(op);
         this.parent = parent;
         this.state = state;
     }
@@ -26,17 +27,29 @@ public class Node {
         return state.toString();
     }
 	
-	static int getCost(PresentationState s){
+	static int getCost(PresentationState s, Set<PresentationOperator> operators){
+		Map<Integer, PresentationOperator> presentationMap = new HashMap<Integer, PresentationOperator>();
+		for (PresentationOperator operator : operators) {
+			presentationMap.put(operator.getId(), operator);
+		}
     	List<String> typeList = new ArrayList<>();
 		int db = 0;
 		int cost = 0;
-		Presentation tabla[][] = s.getTable();
+		int tabla[][] = s.getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			db=0;
 			typeList = new ArrayList<>();
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
-					typeList.add(tabla[i][j].getTopic());
+				if (tabla[i][j] != 0){
+					PresentationOperator presentation = null;
+					for (PresentationOperator o : operators) {
+						if(tabla[i][j] == o.getId()){
+							presentation = o;
+						}
+					}
+					if(!typeList.contains(presentation.getTopic())) {
+						typeList.add(presentation.getTopic());
+					}
 				}
 			}
 			if(typeList!= null){
@@ -47,6 +60,23 @@ public class Node {
 			}
 			cost += db;
 		}
+//		PresentationOperator op1 = null;
+//		PresentationOperator op2 = null;
+//		int found = 0;
+//		for (int i = 0; i < 1; i++) {
+//			for (int j = 0; j < tabla[i].length; j++) {
+//				for (int k = 0; k < tabla.length; k++) {
+//					if(tabla[i][j] != 0 && tabla[k][j] != 0){
+//						op1=presentationMap.get(tabla[i][j]);
+//						op2=presentationMap.get(tabla[k][j]);
+//						if(op1.getTopic().equals(op2.getTopic())){
+//							found++;
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return cost+found;
 		return cost;
     }
 
@@ -56,14 +86,6 @@ public class Node {
 
 	public void setState(PresentationState state) {
 		this.state = state;
-	}
-
-	public PresentationOperator getOp() {
-		return op;
-	}
-
-	public void setOp(PresentationOperator op) {
-		this.op = op;
 	}
 
 	public Node getParent() {
@@ -87,7 +109,6 @@ public class Node {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + cost;
-		result = prime * result + ((op == null) ? 0 : op.hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
 		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		return result;
@@ -103,11 +124,6 @@ public class Node {
 			return false;
 		Node other = (Node) obj;
 		if (cost != other.cost)
-			return false;
-		if (op == null) {
-			if (other.op != null)
-				return false;
-		} else if (!op.equals(other.op))
 			return false;
 		if (parent == null) {
 			if (other.parent != null)

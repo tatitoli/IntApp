@@ -17,11 +17,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,6 +31,7 @@ import javafx.stage.Stage;
 public class MainForm extends Application {
 
 	Presentation[][] table;
+	int[][] intTable;
 	
 	Section section;
 	
@@ -69,11 +72,23 @@ public class MainForm extends Application {
 			System.out.println("Nem lehet beosztani az elõadásokat!");
 		}
 		System.out.println(algorithm.getGoal());
-		table = algorithm.GetTabla();
+		intTable = algorithm.GetTabla();
+		table= new Presentation[intTable.length][intTable[0].length];
+		for (int i = 0; i < intTable.length; i++) {
+			for (int j = 0; j < intTable[i].length; j++) {
+				for (PresentationOperator ope : operators) {
+					if(intTable[i][j] == ope.getId()){
+						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
+								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
+						break;
+					}
+				}
+			}
+		}
 		AppButton[][] buttonTable = new AppButton[section.getSectionNumber()][operators.size()];
 		stage = new Stage();
 		GridPane gridPane = new GridPane();
-		gridPane.setPrefSize(800, 600);
+		int maxWidth=0;
 		for (int i = 0; i < table.length; i++) {
 			for (int j = 0; j < table[i].length; j++) {
 				if (table[i][j] != null) {
@@ -85,7 +100,10 @@ public class MainForm extends Application {
 						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
 					}
 					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
+					if(j>maxWidth){
+					}
 				}
+				maxWidth=i;
 			}
 		}
 		for (int i = 0; i < buttonTable.length; i++) {
@@ -122,7 +140,22 @@ public class MainForm extends Application {
 				}
 			}
 		}
-		Scene scene = new Scene(gridPane, 800, 600);
+		TilePane tilepane = new TilePane();
+		AnchorPane ancher = new AnchorPane();
+//		ancher.setStyle("-fx-background-color: #96012e");
+//		gridPane.setStyle("-fx-background-color: #60002e");
+		ancher.setPrefSize(125, 125);
+		ancher.setMaxSize(125, 125);
+		gridPane.setPrefSize(section.getSectionNumber()*100, maxWidth*75);
+//		GridPane mainGridpane = new GridPane();
+//		mainGridpane.add(gridPane, 0, 0);
+//		mainGridpane.add(ancher, 1, 0);
+//		mainGridpane.getChildren().add(mainGridpane);
+//		mainGridpane.getChildren().add(ancher);
+//		tilepane.getChildren().add(gridPane);
+//		tilepane.getChildren().add(ancher);
+//		tilepane.setTileAlignment(Pos.TOP_CENTER);
+		Scene scene = new Scene(gridPane, 500, 500);
 		stage.setScene(scene);
 		stage.setTitle("Tábla");
 		stage.setResizable(false);

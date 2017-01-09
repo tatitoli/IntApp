@@ -37,7 +37,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 			FileInputStream file = new FileInputStream(new File("test.xls"));
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 			HSSFSheet sheet = workbook.getSheetAt(1);
-			int i = 0;
+			int i = 1;
 			Iterator<Row> rowIterator = sheet.iterator();
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
@@ -88,7 +88,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 			FileInputStream file = new FileInputStream(input);
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 			HSSFSheet sheet = workbook.getSheetAt(1);
-			int i = 0;
+			int i = 1;
 			Iterator<Row> rowIterator = sheet.iterator();
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();

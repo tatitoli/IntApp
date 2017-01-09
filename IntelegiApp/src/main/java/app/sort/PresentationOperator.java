@@ -5,11 +5,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-public class PresentationOperator{
+public class PresentationOperator {
 
 	final String FORMAT = "mm:ss";
 
@@ -22,7 +22,8 @@ public class PresentationOperator{
 	private boolean piority;
 	private int weight;
 
-	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight) {
+	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String to,
+			boolean piority, int weight) {
 		super();
 		this.id = id;
 		this.presentationTitle = presentationTitle;
@@ -34,7 +35,11 @@ public class PresentationOperator{
 		this.weight = weight;
 	}
 
-	public boolean isApplicable(PresentationState s, PresentationOperator o) {
+	public PresentationOperator() {
+		super();
+	}
+
+	public boolean isApplicable(PresentationState s, PresentationOperator o, Set<PresentationOperator> operators) {
 		DateFormat formatter = new SimpleDateFormat(FORMAT);
 		Date toDateOperator = null;
 		Date toDatePresentation = null;
@@ -42,22 +47,32 @@ public class PresentationOperator{
 		Date fromDatePresentation = null;
 		PresentationState state = (PresentationState) s;
 		PresentationOperator operator = (PresentationOperator) o;
-		Presentation tabla[][] = state.getTable();
+		int tabla[][] = state.getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && tabla[i][j].getId() == operator.getId()) {
+				if (tabla[i][j] != 0 && tabla[i][j] == operator.getId()) {
 					return false;
 				}
 			}
 		}
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null) {
+				if (tabla[i][j] != 0) {
+					PresentationOperator presentation = null;
+					for (PresentationOperator ope : operators) {
+						if (tabla[i][j] == ope.getId()) {
+							presentation = ope;
+							break;
+						}
+					}
+					if(presentation.getActor()==operator.getActor()){
+						return false;
+					}
 					try {
 						fromDateOperator = formatter.parse(operator.getFrom());
-						fromDatePresentation = formatter.parse(tabla[i][j].getFrom());
+						fromDatePresentation = formatter.parse(presentation.getFrom());
 						toDateOperator = formatter.parse(operator.getTo());
-						toDatePresentation = formatter.parse(tabla[i][j].getTo());
+						toDatePresentation = formatter.parse(presentation.getTo());
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
@@ -97,33 +112,6 @@ public class PresentationOperator{
 	public String toString() {
 		return "PresentationOperator [presentationTitle=" + presentationTitle + ", actor=" + actor + ", topic=" + topic
 				+ ", from=" + from + ", to=" + to + "]";
-	}
-
-	public int getLowIndex(PresentationState state, PresentationOperator operator){
-		List<String> typeList = new ArrayList<>();
-		int maxCost = Integer.MAX_VALUE;
-		int db = 0;
-		int index = 0;
-		Presentation tabla[][] = state.getTable();
-		for (int i = 0; i < tabla.length; i++) {
-			db = 0;
-			typeList = new ArrayList<>();
-			typeList.add(operator.getTopic());
-			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j] != null && !typeList.contains(tabla[i][j].getTopic())) {
-					typeList.add(tabla[i][j].getTopic());
-				}
-			}
-			db = typeList.size();
-			if(db<0){
-				db = 0;
-			}
-			if(db < maxCost){
-				maxCost = db;
-				index = i;
-			}
-		}
-		return index;
 	}
 
 	public String getPresentationTitle() {
@@ -172,116 +160,73 @@ public class PresentationOperator{
 
 	public void setPiority(boolean piority) {
 		this.piority = piority;
-	}	
-
-	public int getInsertIndex(PresentationState state, PresentationOperator operator) {
-		DateFormat formatter = new SimpleDateFormat(FORMAT);
-		Date toDateOperator = null;
-		Date toDatePresentation = null;
-		Date fromDateOperator = null;
-		Date fromDatePresentation = null;
-		int index = 0;
-		boolean insert = true;
-		Presentation tabla[][] = state.getTable();
-		for (int i = 0; i < tabla.length; i++) {
-			for (int j = 0; j < tabla[i].length; j++) {
-				if(tabla[i][j] == null){
-					return i;
-				}
-				if (tabla[i][j] != null) {
-					try {
-						fromDateOperator = formatter.parse(operator.getFrom());
-						fromDatePresentation = formatter.parse(tabla[i][j].getFrom());
-						toDateOperator = formatter.parse(operator.getTo());
-						toDatePresentation = formatter.parse(tabla[i][j].getTo());
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					if (fromDateOperator.getTime() == fromDatePresentation.getTime()
-							&& toDateOperator.getTime() <= toDatePresentation.getTime()) {
-						insert = false;
-					}
-					if (fromDateOperator.getTime() >= fromDatePresentation.getTime()
-							&& toDateOperator.getTime() == toDatePresentation.getTime()) {
-						insert = false;
-					}
-					if (fromDateOperator.getTime() <= fromDatePresentation.getTime()
-							&& toDateOperator.getTime() >= toDatePresentation.getTime()) {
-						insert = false;
-					}
-					if (fromDateOperator.getTime() <= fromDatePresentation.getTime()
-							&& toDateOperator.getTime() > fromDatePresentation.getTime()) {
-						insert = false;
-					}
-					if (toDateOperator.getTime() >= toDatePresentation.getTime()
-							&& fromDateOperator.getTime() < toDatePresentation.getTime()) {
-						insert = false;
-					}
-				}
-				if(insert){
-					index =i;
-				}
-			}
-		}
-		return index;
 	}
 
 	public PresentationState apply(PresentationState state, PresentationOperator operator) {
 		List<Integer> lista = new ArrayList<>();
-		List<Integer> hasIndex = new ArrayList<Integer>(); 
-		Presentation insertPresentation = new Presentation(operator.getId(), operator.getPresentationTitle(), operator.getActor(), operator.getTopic(), operator.getFrom(), operator.getTo(), operator.isPiority(),operator.getWeight());
-//		for (Node node : closedNodes) {
-//			PresentationState tempState = node.getState();
-//			Presentation tabla[][] = tempState.getTable();
-//			for (int i = 0; i < tabla.length; i++) {
-//				for (int j = 0; j < tabla[i].length; j++) {
-//					if(insertPresentation.equals(tabla[i][j])){
-//						hasIndex.add(i);
-//						break;
-//					}
-//				}
-//			}
-//		}
-		Presentation tabla[][] = state.getTable();
-//		for (int i = 0; i < tabla.length; i++) {
-//			lista.add(i);
-//		}
-//		lista.removeAll(hasIndex);
+		List<Integer> hasIndex = new ArrayList<Integer>();
+		// Presentation insertPresentation = new Presentation(operator.getId(),
+		// operator.getPresentationTitle(), operator.getActor(),
+		// operator.getTopic(), operator.getFrom(), operator.getTo(),
+		// operator.isPiority(),operator.getWeight());
+		// for (Node node : closedNodes) {
+		// PresentationState tempState = node.getState();
+		// Presentation tabla[][] = tempState.getTable();
+		// for (int i = 0; i < tabla.length; i++) {
+		// for (int j = 0; j < tabla[i].length; j++) {
+		// if(insertPresentation.equals(tabla[i][j])){
+		// hasIndex.add(i);
+		// break;
+		// }
+		// }
+		// }
+		// }
+		int tabla[][] = state.getTable();
+		// for (int i = 0; i < tabla.length; i++) {
+		// lista.add(i);
+		// }
+		// lista.removeAll(hasIndex);
 		Random randomGenerator = new Random();
 		int randomInt = randomGenerator.nextInt(tabla.length);
-//		boolean insert = false;
-//		for (int i = 0; i < tabla.length; i++) {
-//			if (insert) {
-//				break;
-//			}
-//			if (!hasIndex.contains(i)) {
-//				for (int j = 0; j < tabla[i].length; j++) {
-//					if (tabla[i][j] == null) {
-//						tabla[i][j] = insertPresentation;
-//						insert = true;
-//						break;
-//					}
-//
-//				}
-//			}
-//		}
-		Presentation newTabla[][] = new Presentation[tabla.length][tabla[0].length];
+		boolean insert = false;
+		// for (int i = 0; i < tabla.length; i++) {
+		// if (insert) {
+		// break;
+		// }
+		// if (!hasIndex.contains(i)) {
+		// for (int j = 0; j < tabla[i].length; j++) {
+		// if (tabla[i][j] == null) {
+		// tabla[i][j] = insertPresentation;
+		// insert = true;
+		// break;
+		// }
+		//
+		// }
+		// }
+		// }
+		int newTabla[][] = new int[tabla.length][tabla[0].length];
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if(tabla[i][j] != null){
+				if (tabla[i][j] != 0) {
 					newTabla[i][j] = tabla[i][j];
 				}
 			}
 		}
 		for (int i = 0; i < newTabla[randomInt].length; i++) {
-			if (newTabla[randomInt][i] == null) {
-				newTabla[randomInt][i] = insertPresentation;
+			if (newTabla[randomInt][i] == 0) {
+				newTabla[randomInt][i] = operator.getId();
+				insert = true;
 				break;
 			}
 		}
-		PresentationState newState = new PresentationState();
-		newState.setTable(newTabla);
-		return newState;
+		if (insert) {
+			PresentationState newState = new PresentationState();
+			newState.setTable(newTabla);
+			return newState;
+		}
+		else{
+			return null;
+		}
 	}
 
 	public int getId() {

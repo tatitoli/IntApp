@@ -1,6 +1,7 @@
 package app.view;
 
 import app.sort.Presentation;
+import app.sort.PresentationOperator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -43,7 +44,11 @@ public class ChangeForm {
 
 	@FXML
 	public void changeButtonAction(ActionEvent event) {
-
+		PresentationOperator newOperator = new PresentationOperator();
+		newOperator.setId(presentationId);
+		newOperator.setPiority(new Boolean(piority.getText()));
+		newOperator.setWeight(Integer.parseInt(weight.getText()));
+		
 	}
 
 	public void setPresentation(int id, Presentation[][] table) {
@@ -57,6 +62,7 @@ public class ChangeForm {
 						time.setText(table[i][j].getFrom() + " - " + table[i][j].getTo());
 						weight.setText(table[i][j].getWeight()+"");
 						piority.setSelected(table[i][j].isPoirity());
+						presentationId = id;
 						break;
 					}
 				}
