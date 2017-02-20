@@ -4,6 +4,7 @@
  */
 package app.sort;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class Optimal {
 
 			closedNodes.add(node);
 			for (PresentationOperator op : p.operators()) {
-				PresentationOperator operator = (PresentationOperator) op;
-				if (operator.isPiority() == true) {
+//				PresentationOperator operator = (PresentationOperator) op;
+				if (op.isPiority() == true) {
 					if (!op.isApplicable(node.state, op, p.operators)) {
 						break;
 					}
@@ -45,7 +46,7 @@ public class Optimal {
 				if (op.isApplicable(node.state, op, p.operators)) {
 					PresentationState newState = op.apply(node.state, op);
 					if (newState != null) {
-						if (search(closedNodes, newState) != null) {
+						if (search(closedNodes, newState)) {
 							continue;
 						}
 						Node newNode = null;
@@ -71,15 +72,40 @@ public class Optimal {
 		}
 		return index;
 	}
-
-	private Node search(List<Node> nodeList, PresentationState state) {
+	
+	private boolean search(List<Node> nodeList, PresentationState state) {
+		int[][] actualState = state.getTable();
+		ArrayList<Integer> nodeArrayList = new ArrayList<>();
+		ArrayList<Integer> stateArrayList = new ArrayList<>();
 		for (Node node : nodeList) {
-			if (state.equals(node.state)) {
-				return node;
+			int[][]nodeState = node.getState().getTable();
+			for (int i = 0; i < nodeState.length; i++) {
+				nodeArrayList = new ArrayList<>();
+				stateArrayList = new ArrayList<>();
+				for (int j = 0; j < nodeState[i].length; j++) {
+					if(nodeState[i][j] != 0){
+						nodeArrayList.add(nodeState[i][j]);
+					}
+					if(actualState[i][j] != 0){
+						stateArrayList.add(actualState[i][j]);
+					}
+				}
+				if(nodeArrayList.contains(stateArrayList)){
+					return true;
+				}
 			}
 		}
-		return null;
+		return false;
 	}
+
+//	private Node search(List<Node> nodeList, PresentationState state) {
+//		for (Node node : nodeList) {
+//			if (state.equals(node.state)) {
+//				return node;
+//			}
+//		}
+//		return null;
+//	}
 
 	public String getGoal() {
 		return (String) node.state.getGoal();

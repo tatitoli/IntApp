@@ -43,7 +43,7 @@ public class PresentationProblem{
 		this.presentationIds = presentationIds;
 	}
 
-	public static Set<PresentationOperator> getOperators() {
+	public Set<PresentationOperator> getOperators() {
 		return operators;
 	}
 

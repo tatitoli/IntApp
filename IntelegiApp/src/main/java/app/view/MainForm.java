@@ -26,6 +26,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainForm extends Application {
@@ -85,81 +86,85 @@ public class MainForm extends Application {
 				}
 			}
 		}
-		AppButton[][] buttonTable = new AppButton[section.getSectionNumber()][operators.size()];
-		stage = new Stage();
-		GridPane gridPane = new GridPane();
-		int maxWidth=0;
-		for (int i = 0; i < table.length; i++) {
-			for (int j = 0; j < table[i].length; j++) {
-				if (table[i][j] != null) {
-					buttonTable[i][j] = new AppButton(i);
-					buttonTable[i][j].setPresentationId(table[i][j].getId());
-					buttonTable[i][j].setText(table[i][j].getTopic()+ "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
-					buttonTable[i][j].setPrefSize(100, 75);
-					if(table[i][j].isPoirity()){
-						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
-					}
-					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
-					if(j>maxWidth){
-					}
-				}
-				maxWidth=i;
-			}
+//		AppButton[][] buttonTable = new AppButton[section.getSectionNumber()][operators.size()];
+//		stage = new Stage();
+//		GridPane gridPane = new GridPane();
+//		int maxWidth=0;
+//		for (int i = 0; i < table.length; i++) {
+//			for (int j = 0; j < table[i].length; j++) {
+//				if (table[i][j] != null) {
+//					buttonTable[i][j] = new AppButton(i);
+//					buttonTable[i][j].setPresentationId(table[i][j].getId());
+//					buttonTable[i][j].setText(table[i][j].getTopic()+ "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
+//					buttonTable[i][j].setPrefSize(100, 75);
+//					if(table[i][j].isPoirity()){
+//						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
+//					}
+//					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
+//					if(j>maxWidth){
+//					}
+//				}
+//				maxWidth=i;
+//			}
+//		}
+//		for (int i = 0; i < buttonTable.length; i++) {
+//			for (int j = 0; j < buttonTable[i].length; j++) {
+//				if (buttonTable[i][j] != null) {
+//					final AppButton myButton = buttonTable[i][j];
+//					myButton.setOnAction(new EventHandler<ActionEvent>() {
+//						public void handle(ActionEvent event) {
+//							FXMLLoader loader = new FXMLLoader();
+//							loader.setLocation(ChangeForm.class.getResource("/ButtonElement.fxml"));
+//							AnchorPane fightView;
+//							try {
+//								fightView = (AnchorPane)loader.load();
+//							Stage stage = new Stage();
+//							stage.setTitle("Elõadás");
+//							Scene scene = new Scene(fightView);
+//							stage.setScene(scene);
+//							ChangeForm controller = loader.getController();
+//							controller.setPresentation(myButton.getPresentationId(), table);
+//							stage.setResizable(false);
+//							stage.show();
+//							} catch (IOException e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					});
+//				}
+//			}
+//		}
+//		for (int i = 0; i < buttonTable.length; i++) {
+//			for (int j = 0; j < buttonTable[i].length; j++) {
+//				if (buttonTable[i][j] != null) {
+//					gridPane.add(buttonTable[i][j], i, j);
+//				}
+//			}
+//		}
+		
+		
+		//Porba
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainForm.class.getResource("/Table.fxml"));
+		try {
+			AnchorPane fightView = (AnchorPane) loader.load();
+			Stage stage = new Stage();
+			stage.setTitle("Elõadások");
+			stage.initModality(Modality.WINDOW_MODAL);
+
+			Scene scene = new Scene(fightView);
+			stage.setScene(scene);
+
+			TableControl controller = loader.getController();
+			controller.setFirstGrid(table, operators, section);
+			stage.setResizable(false);
+			stage.show();
+			Stage actualStage = (Stage) generateButton.getScene().getWindow();
+			actualStage.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		for (int i = 0; i < buttonTable.length; i++) {
-			for (int j = 0; j < buttonTable[i].length; j++) {
-				if (buttonTable[i][j] != null) {
-					final AppButton myButton = buttonTable[i][j];
-					myButton.setOnAction(new EventHandler<ActionEvent>() {
-						public void handle(ActionEvent event) {
-							FXMLLoader loader = new FXMLLoader();
-							loader.setLocation(ChangeForm.class.getResource("/ButtonElement.fxml"));
-							AnchorPane fightView;
-							try {
-								fightView = (AnchorPane)loader.load();
-							Stage stage = new Stage();
-							stage.setTitle("Elõadás");
-							Scene scene = new Scene(fightView);
-							stage.setScene(scene);
-							ChangeForm controller = loader.getController();
-							controller.setPresentation(myButton.getPresentationId(), table);
-							stage.setResizable(false);
-							stage.show();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					});
-				}
-			}
-		}
-		for (int i = 0; i < buttonTable.length; i++) {
-			for (int j = 0; j < buttonTable[i].length; j++) {
-				if (buttonTable[i][j] != null) {
-					gridPane.add(buttonTable[i][j], i, j);
-				}
-			}
-		}
-		TilePane tilepane = new TilePane();
-		AnchorPane ancher = new AnchorPane();
-//		ancher.setStyle("-fx-background-color: #96012e");
-//		gridPane.setStyle("-fx-background-color: #60002e");
-		ancher.setPrefSize(125, 125);
-		ancher.setMaxSize(125, 125);
-		gridPane.setPrefSize(section.getSectionNumber()*100, maxWidth*75);
-//		GridPane mainGridpane = new GridPane();
-//		mainGridpane.add(gridPane, 0, 0);
-//		mainGridpane.add(ancher, 1, 0);
-//		mainGridpane.getChildren().add(mainGridpane);
-//		mainGridpane.getChildren().add(ancher);
-//		tilepane.getChildren().add(gridPane);
-//		tilepane.getChildren().add(ancher);
-//		tilepane.setTileAlignment(Pos.TOP_CENTER);
-		Scene scene = new Scene(gridPane, 500, 500);
-		stage.setScene(scene);
-		stage.setTitle("Tábla");
-		stage.setResizable(false);
-		stage.show();
 	}
 
 	@Override
