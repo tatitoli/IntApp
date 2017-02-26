@@ -2,19 +2,18 @@ package app.sort;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class PresentationProblem{
 
 	private int x;
 	private int y;
-	static Set<PresentationOperator> operators = new HashSet<>();
+	static LinkedList<PresentationOperator> operators = new LinkedList<>();
 	List<Integer> presentationIds = new ArrayList<>();
 
 	public PresentationProblem() {
-		operators = new HashSet<>();
+		operators = new LinkedList<>();
 		for (PresentationOperator o : operators) {
 			if (!presentationIds.contains(o.getId())) {
 				presentationIds.add(o.getId());
@@ -43,11 +42,11 @@ public class PresentationProblem{
 		this.presentationIds = presentationIds;
 	}
 
-	public Set<PresentationOperator> getOperators() {
+	public LinkedList<PresentationOperator> getOperators() {
 		return operators;
 	}
 
-	public static void setOperators(Set<PresentationOperator> operators) {
+	public static void setOperators(LinkedList<PresentationOperator> operators) {
 		PresentationProblem.operators = operators;
 	}
 

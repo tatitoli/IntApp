@@ -1,20 +1,20 @@
 package app.dao;
 
 import java.io.File;
-import java.util.Set;
+import java.util.LinkedList;
 
 import app.model.Section;
 import app.sort.PresentationOperator;
 
 public interface PresentationsDao {
 	
-	Set<PresentationOperator> readPresentations();
+	LinkedList<PresentationOperator> readPresentations();
 	
-	Set<PresentationOperator> getPresentations();
+	LinkedList<PresentationOperator> getPresentations();
 	
 	void writePresentations();
 
-	Set<PresentationOperator> getPresentations(File file);
+	LinkedList<PresentationOperator> getPresentations(File file);
 
 	Section getSection(File input);
 }

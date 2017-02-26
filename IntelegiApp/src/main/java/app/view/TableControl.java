@@ -6,8 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
 
 import app.model.AppButton;
 import app.model.Section;
@@ -15,6 +14,7 @@ import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
+import app.sort.TryError;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,7 +36,7 @@ public class TableControl {
 	
 	final String FORMAT = "mm:ss";
 	DateFormat formatter = new SimpleDateFormat(FORMAT);
-	Set<PresentationOperator> operatorsTab = new HashSet<>();
+	LinkedList<PresentationOperator> operatorsTab = new LinkedList<>();
 	Section sectionTab;
 	int[][] intTable;
 	
@@ -104,7 +104,7 @@ public class TableControl {
 		tabPane.getTabs().add(tab);
 	}
 
-	public void setFirstGrid(Presentation[][] table, Set<PresentationOperator> operators, Section section) {
+	public void setFirstGrid(Presentation[][] table, LinkedList<PresentationOperator> operators, Section section) {
 		operatorsTab = operators;
 		sectionTab = section;
 		tableMod = new Presentation[table.length][table[0].length];
@@ -211,19 +211,42 @@ public class TableControl {
 			}
 		}
 	}
+	
+	public LinkedList<PresentationOperator> updateOperatorList(LinkedList<PresentationOperator> operators){
+		LinkedList<PresentationOperator> newOperatorList = new LinkedList<>();
+		for (PresentationOperator presentationOperator : operators) {
+			if(presentationOperator.isPiority()){
+				newOperatorList.addFirst(presentationOperator);
+			}else{
+				newOperatorList.add(presentationOperator);
+			}
+		}
+		return newOperatorList;
+	}
 
 	@FXML
 	public void reGenerateAction(ActionEvent event){
 		PresentationProblem problem = new PresentationProblem();
-		PresentationProblem.setOperators(operatorsTab);
+		LinkedList<PresentationOperator> newOperatorList = new LinkedList<>();
+		newOperatorList = updateOperatorList(operatorsTab);
+		PresentationProblem.setOperators(newOperatorList);
 		problem.setX(sectionTab.getSectionNumber());
 		problem.setY(operatorsTab.size());
-		Optimal algorithm = new Optimal(problem);
+		int db = 0, min=Integer.MAX_VALUE;
+		while(db<11){
+			TryError tryError = new TryError(problem);
+			if(tryError.run()){
+				if(min <= tryError.GetLastCost()){
+					min = tryError.GetLastCost();
+				}
+				db++;
+			}
+		}
+		Optimal algorithm = new Optimal(problem,min);
 		boolean run = algorithm.run();
 		if (run == false) {
 			System.out.println("Nem lehet beosztani az elõadásokat!");
 		}
-		System.out.println(algorithm.getGoal());
 		intTable = algorithm.GetTabla();
 		tableMod= new Presentation[intTable.length][intTable[0].length];
 		for (int i = 0; i < intTable.length; i++) {
@@ -266,18 +289,20 @@ public class TableControl {
 		for (PresentationOperator op : operatorsTab) {
 			if(op.getId() == presentationId){
 				op.setWeight(Integer.parseInt(weight.getText()));
+				op.setPiority(piority.isSelected());
 			}
 		}
 		PresentationOperator newOperator = new PresentationOperator();
 		newOperator.setId(presentationId);
-		newOperator.setPiority(new Boolean(piority.getText()));
-		newOperator.setWeight(Integer.parseInt(weight.getText()));	
+		newOperator.setPiority(new Boolean(piority.isSelected()));
+		newOperator.setWeight(Integer.parseInt(weight.getText()));
 		
 		for (int i = 0; i < tableMod.length; i++) {
 			for (int j = 0; j < tableMod[i].length; j++) {
 				if (tableMod[i][j] != null) {
 					if (presentationId == tableMod[i][j].getId()) {
 						tableMod[i][j].setWeight(Integer.parseInt(weight.getText()));
+						tableMod[i][j].setPoirity(piority.isSelected());
 						break;
 					}
 				}

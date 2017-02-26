@@ -2,29 +2,23 @@ package app.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
 
 import app.daoimp.PresentationsDaoImp;
-import app.model.AppButton;
 import app.model.Section;
 import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
+import app.sort.TryError;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -60,19 +54,28 @@ public class MainForm extends Application {
 	@FXML
 	public void generateAction(ActionEvent event) throws IOException {
 		PresentationsDaoImp impDao = new PresentationsDaoImp();
-		Set<PresentationOperator> operators = new HashSet<>();
+		LinkedList<PresentationOperator> operators = new LinkedList<>();
 		operators = impDao.getPresentations(selectedFile);
 		section = impDao.getSection(selectedFile);
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
 		problem.setX(section.getSectionNumber());
 		problem.setY(operators.size());
-		Optimal algorithm = new Optimal(problem);
+		int db = 0, min=Integer.MAX_VALUE;
+		while(db<11){
+			TryError tryError = new TryError(problem);
+			if(tryError.run()){
+				if(min >= tryError.GetLastCost()){
+					min = tryError.GetLastCost();
+				}
+				db++;
+			}
+		}
+		Optimal algorithm = new Optimal(problem,min);
 		boolean run = algorithm.run();
 		if (run == false) {
 			System.out.println("Nem lehet beosztani az elõadásokat!");
 		}
-		System.out.println(algorithm.getGoal());
 		intTable = algorithm.GetTabla();
 		table= new Presentation[intTable.length][intTable[0].length];
 		for (int i = 0; i < intTable.length; i++) {
@@ -173,7 +176,7 @@ public class MainForm extends Application {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainForm.class.getResource("/MainForm.fxml"));
 		Parent root = loader.load();
-		Scene scene = new Scene(root, 640, 480);
+		Scene scene = new Scene(root, 389.0,249);
 		// scene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Fõoldal");

@@ -7,20 +7,15 @@ package app.sort;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
-public class Optimal {
+public class TryError {
 
 	PresentationProblem p;
-	int min;
 	PresentationProblem seged;
 
-	public Optimal(PresentationProblem p) {
+	public TryError(PresentationProblem p) {
 		this.p = p;
-	}
-
-	public Optimal(PresentationProblem p, int min) {
-		this.p = p;
-		this.min = min;
 	}
 
 	private LinkedList<Node> openNodes;
@@ -36,19 +31,16 @@ public class Optimal {
 				return false;
 			}
 
-			node = openNodes.remove(getLowCostNode(openNodes));
+			Random randomGenerator = new Random();
+			int randomInt = randomGenerator.nextInt(openNodes.size());
+			node = openNodes.remove(randomInt);
 			if (node.state.isGoal(p)) {
 				return true;
 			}
 
 			closedNodes.add(node);
-			for (PresentationOperator op : p.operators()) {
-				if (op.isPiority() == true) {
-					LinkedList<Integer> prioList = getPiorityList(node.state);
-					if (!op.isApplicable(node.state, op, PresentationProblem.operators) && !prioList.contains(op.getId())) {
-						break;
-					}
-				}
+			randomInt = randomGenerator.nextInt(p.operators().size());
+			PresentationOperator op = PresentationProblem.operators.get(randomInt);
 				if (op.isApplicable(node.state, op, PresentationProblem.operators)) {
 					PresentationState newState = op.apply(node.state, op);
 					if (newState != null) {
@@ -57,45 +49,12 @@ public class Optimal {
 						}
 						Node newNode = null;
 						newNode = new Node(newState, op, node, PresentationProblem.operators);
-						if(newNode.getCost() > min){
-							closedNodes.add(newNode);
-						}else{
-							openNodes.addLast(newNode);
-						}
+						openNodes.addLast(newNode);
 					}
 				}
-			}
 		}
 	}
 
-	private LinkedList<Integer> getPiorityList(PresentationState state) {
-		int temp[][] = state.getTable();
-		LinkedList<Integer> tempList = new LinkedList<>();
-		for (int i = 0; i < temp.length; i++) {
-			for (int j = 0; j < temp[i].length; j++) {
-				if(temp[i][j]!=0){
-					tempList.add(temp[i][j]);
-				}
-			}
-		}
-		return tempList;
-	}
-
-	private int getLowCostNode(LinkedList<Node> openNodes) {
-		int index = 0, i = 0;
-		int cost = Integer.MAX_VALUE;
-		int stateCost = 0;
-		for (Node node : openNodes) {
-			stateCost = node.getCost();
-			if (cost > stateCost) {
-				cost = stateCost;
-				index = i;
-			}
-			i++;
-		}
-		return index;
-	}
-	
 	private boolean search(List<Node> nodeList, PresentationState state) {
 		int[][] actualState = state.getTable();
 		ArrayList<Integer> nodeArrayList = new ArrayList<>();
@@ -119,6 +78,19 @@ public class Optimal {
 			}
 		}
 		return false;
+	}
+
+//	private Node search(List<Node> nodeList, PresentationState state) {
+//		for (Node node : nodeList) {
+//			if (state.equals(node.state)) {
+//				return node;
+//			}
+//		}
+//		return null;
+//	}
+	
+	public int GetLastCost(){
+		return node.cost;
 	}
 
 	public String getGoal() {

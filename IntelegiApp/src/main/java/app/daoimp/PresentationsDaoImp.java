@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.LinkedList;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -21,7 +20,7 @@ import app.sort.PresentationOperator;
 public class PresentationsDaoImp implements PresentationsDao {
 
 	@Override
-	public Set<PresentationOperator> readPresentations() {
+	public LinkedList<PresentationOperator> readPresentations() {
 		return null;
 	}
 
@@ -31,8 +30,8 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 	
 	@Override
-	public Set<PresentationOperator> getPresentations() {
-		Set<PresentationOperator> operators = new HashSet<>();
+	public LinkedList<PresentationOperator> getPresentations() {
+		LinkedList<PresentationOperator> operators = new LinkedList<>();
 		try {
 			FileInputStream file = new FileInputStream(new File("test.xls"));
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
@@ -47,58 +46,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 					String topic = null;
 					String from = null;
 					String to = null;
-					Iterator<Cell> cellIterator = row.cellIterator();
-					while (cellIterator.hasNext()) {
-						Cell cell = cellIterator.next();
-						switch (cell.getColumnIndex()) {
-						case 0:
-							presentationTitle = cell.getStringCellValue();
-							break;
-						case 1:
-							actor = cell.getStringCellValue();
-							break;
-						case 2:
-							topic = cell.getStringCellValue();
-							break;
-						case 3:
-							from = new DataFormatter().formatCellValue(cell);
-							break;
-						case 4:
-							to = new DataFormatter().formatCellValue(cell);
-							break;
-						}
-					}
-					operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
-					i++;
-				}
-			}
-			file.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return operators;
-	}
-
-	@Override
-	public Set<PresentationOperator> getPresentations(File input) {
-		Set<PresentationOperator> operators = new HashSet<>();
-		try {
-			FileInputStream file = new FileInputStream(input);
-			HSSFWorkbook workbook = new HSSFWorkbook(file);
-			HSSFSheet sheet = workbook.getSheetAt(1);
-			int i = 1;
-			Iterator<Row> rowIterator = sheet.iterator();
-			while (rowIterator.hasNext()) {
-				Row row = rowIterator.next();
-				if (row.getRowNum() > 0) {
-					String presentationTitle  = null;
-					String actor = null;
-					String topic = null;
-					String from = null;
-					String to = null;
-					boolean pioritas = false;
+					String fontos = null;
 					Iterator<Cell> cellIterator = row.cellIterator();
 					while (cellIterator.hasNext()) {
 						Cell cell = cellIterator.next();
@@ -119,13 +67,75 @@ public class PresentationsDaoImp implements PresentationsDao {
 							to = new DataFormatter().formatCellValue(cell);
 							break;
 						case 5:
-							if("Igen".equals(new DataFormatter().formatCellValue(cell))){
-								pioritas = true;
-							}
+							fontos = cell.getStringCellValue();
 							break;
 						}
 					}
-					operators.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, pioritas,15));
+					if("Fontos".equals(fontos)){				
+						operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, from, to, true,15));
+					}else{
+						operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
+					}
+					i++;
+				}
+			}
+			file.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return operators;
+	}
+
+	@Override
+	public LinkedList<PresentationOperator> getPresentations(File input) {
+		LinkedList<PresentationOperator> operators = new LinkedList<>();
+		try {
+			FileInputStream file = new FileInputStream(input);
+			HSSFWorkbook workbook = new HSSFWorkbook(file);
+			HSSFSheet sheet = workbook.getSheetAt(1);
+			int i = 1;
+			Iterator<Row> rowIterator = sheet.iterator();
+			while (rowIterator.hasNext()) {
+				Cell cell = null;
+				Row row = rowIterator.next();
+				if (row.getRowNum() > 0) {
+					String presentationTitle  = null;
+					String actor = null;
+					String topic = null;
+					String from = null;
+					String to = null;
+					String fontos = null;
+					Iterator<Cell> cellIterator = row.cellIterator();
+					while (cellIterator.hasNext()) {
+						cell = cellIterator.next();
+						switch (cell.getColumnIndex()) {
+						case 0:
+							presentationTitle = cell.getStringCellValue();
+							break;
+						case 1:
+							actor = cell.getStringCellValue();
+							break;
+						case 2:
+							topic = cell.getStringCellValue();
+							break;
+						case 3:
+							from = new DataFormatter().formatCellValue(cell);
+							break;
+						case 4:
+							to = new DataFormatter().formatCellValue(cell);
+							break;
+						case 5:
+							fontos = cell.getStringCellValue();
+							break;
+						}
+					}
+					if("Fontos".equals(fontos)){				
+						operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, from, to, true,15));
+					}else{
+						operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
+					}
 					i++;
 				}
 			}

@@ -3,11 +3,9 @@ package app.sort;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Random;
-import java.util.Set;
 
 public class PresentationOperator {
 
@@ -39,7 +37,7 @@ public class PresentationOperator {
 		super();
 	}
 
-	public boolean isApplicable(PresentationState s, PresentationOperator o, Set<PresentationOperator> operators) {
+	public boolean isApplicable(PresentationState s, PresentationOperator o, LinkedList<PresentationOperator> operators) {
 		DateFormat formatter = new SimpleDateFormat(FORMAT);
 		Date toDateOperator = null;
 		Date toDatePresentation = null;
@@ -64,9 +62,6 @@ public class PresentationOperator {
 							presentation = ope;
 							break;
 						}
-					}
-					if(presentation.getActor()==operator.getActor()){
-						return false;
 					}
 					try {
 						fromDateOperator = formatter.parse(operator.getFrom());
@@ -163,47 +158,10 @@ public class PresentationOperator {
 	}
 
 	public PresentationState apply(PresentationState state, PresentationOperator operator) {
-		List<Integer> lista = new ArrayList<>();
-		List<Integer> hasIndex = new ArrayList<Integer>();
-		// Presentation insertPresentation = new Presentation(operator.getId(),
-		// operator.getPresentationTitle(), operator.getActor(),
-		// operator.getTopic(), operator.getFrom(), operator.getTo(),
-		// operator.isPiority(),operator.getWeight());
-		// for (Node node : closedNodes) {
-		// PresentationState tempState = node.getState();
-		// Presentation tabla[][] = tempState.getTable();
-		// for (int i = 0; i < tabla.length; i++) {
-		// for (int j = 0; j < tabla[i].length; j++) {
-		// if(insertPresentation.equals(tabla[i][j])){
-		// hasIndex.add(i);
-		// break;
-		// }
-		// }
-		// }
-		// }
 		int tabla[][] = state.getTable();
-		// for (int i = 0; i < tabla.length; i++) {
-		// lista.add(i);
-		// }
-		// lista.removeAll(hasIndex);
 		Random randomGenerator = new Random();
 		int randomInt = randomGenerator.nextInt(tabla.length);
 		boolean insert = false;
-		// for (int i = 0; i < tabla.length; i++) {
-		// if (insert) {
-		// break;
-		// }
-		// if (!hasIndex.contains(i)) {
-		// for (int j = 0; j < tabla[i].length; j++) {
-		// if (tabla[i][j] == null) {
-		// tabla[i][j] = insertPresentation;
-		// insert = true;
-		// break;
-		// }
-		//
-		// }
-		// }
-		// }
 		int newTabla[][] = new int[tabla.length][tabla[0].length];
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
@@ -307,5 +265,57 @@ public class PresentationOperator {
 		if (weight != other.weight)
 			return false;
 		return true;
+	}
+
+	public PresentationState apply(PresentationState state, PresentationOperator op, LinkedList<PresentationOperator> operators) {
+		LinkedList<String> typeList = new LinkedList<>();
+		int tabla[][] = state.getTable();
+		boolean insert = false;
+		int newTabla[][] = new int[tabla.length][tabla[0].length];
+		for (int i = 0; i < tabla.length; i++) {
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != 0) {
+					newTabla[i][j] = tabla[i][j];
+				}
+			}
+		}
+		PresentationOperator presentation = null;
+		int typeCount = Integer.MAX_VALUE;
+		int index = 0;
+		for (int i = 0; i < tabla.length; i++) {
+			typeList = new LinkedList<>();
+			typeList.add(op.getTopic());
+			for (int j = 0; j < tabla[i].length; j++) {
+				if (tabla[i][j] != 0) {
+					for (PresentationOperator operator : operators) {
+						if(operator.getId() == tabla[i][j]){
+							presentation  = operator;
+						}
+					}
+					if(!typeList.contains(presentation.getTopic())){
+						typeList.add(presentation.getTopic());
+					}
+				}
+			}
+			if(typeList.size() < typeCount){
+				typeCount = typeList.size()-1;
+				index = i;
+			}
+		}
+		for (int i = 0; i < newTabla[index].length; i++) {
+			if (newTabla[index][i] == 0) {
+				newTabla[index][i] = op.getId();
+				insert = true;
+				break;
+			}
+		}
+		if (insert) {
+			PresentationState newState = new PresentationState();
+			newState.setTable(newTabla);
+			return newState;
+		}
+		else{
+			return null;
+		}
 	}
 }
