@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import app.model.Section;
 
 public class PresentationProblem{
 
 	private int x;
 	private int y;
+	private Section section;
+	private LinkedList<String> sections;
 	static LinkedList<PresentationOperator> operators = new LinkedList<>();
 	List<Integer> presentationIds = new ArrayList<>();
 
@@ -65,4 +70,22 @@ public class PresentationProblem{
 	public void setY(int y) {
 		this.y = y;
 	}
+
+	public PresentationState startMapState(LinkedList<PresentationOperator> operators) {
+		return new PresentationState(operators, sections);
+	}
+
+	public void setMapSize(LinkedList<String> sections) {
+		this.sections = sections;
+	}
+
+	public Section getSection() {
+		return section;
+	}
+
+	public void setSection(Section section) {
+		this.section = section;
+	}
+	
+	
 }

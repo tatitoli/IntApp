@@ -3,12 +3,20 @@ package app.sort;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
-public class PresentationOperator {
+import app.model.Section;
 
+public class PresentationOperator {
+	
+	DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 	final String FORMAT = "mm:ss";
 
 	private int id;
@@ -16,6 +24,7 @@ public class PresentationOperator {
 	private String actor;
 	private String topic;
 	private String from;
+	private String inter;
 	private String to;
 	private boolean piority;
 	private int weight;
@@ -35,6 +44,70 @@ public class PresentationOperator {
 
 	public PresentationOperator() {
 		super();
+	}
+
+	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String inter, String from, String to,
+			boolean piority, int weight) {
+		super();
+		this.id = id;
+		this.presentationTitle = presentationTitle;
+		this.actor = actor;
+		this.topic = topic;
+		this.inter = inter;
+		this.from = from;
+		this.to = to;
+		this.piority = piority;
+		this.weight = weight;
+	}
+	
+	public boolean isApplicableMap(PresentationState s, PresentationOperator o, LinkedList<PresentationOperator> operators, Section section){
+		Map<String, LinkedList<Integer>> presentationMap = new HashMap<>();
+		presentationMap = s.getMapTabel();
+		boolean canInsert = true;
+		if(presentationMap.isEmpty()){
+			return true;
+		}
+		LocalTime localtime = null;
+		for (Map.Entry<String, LinkedList<Integer>> entry : presentationMap.entrySet()) {
+			LinkedList<Integer> idList = entry.getValue();
+			for (int i = 0; i < idList.size(); i++) {
+				if(idList.get(i) == o.getId()){
+					return false;
+				}
+			}
+			if(idList.size()!=0){
+				String tmp = o.getFrom().substring(0, 10);
+				if(entry.getKey().contains(tmp)){
+					 localtime = LocalTime.parse(section.getFrom(), formatter);
+//					localtime = LocalTime.parse(section.getFrom());
+					PresentationOperator actualPresentation = null;
+					for (int i = 0; i < idList.size(); i++) {
+						for (PresentationOperator operator : operators) {
+							if(idList.contains(operator.getId())){
+								actualPresentation = operator;
+								String tmpInter = actualPresentation.getInter();
+								String[] interArray = tmpInter.split("\\.");
+								localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+							}
+						}
+					}
+				}
+				String tmpInter = o.getInter();
+				String[] interArray = tmpInter.split("\\.");
+				localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+				String[] from = o.getFrom().split(" ");
+				String[] to = o.getTo().split(" ");
+				LocalTime fromLT = LocalTime.parse(from[3], formatter);
+				LocalTime toLT = LocalTime.parse(to[3], formatter);
+				if(!localtime.isAfter(fromLT) || !localtime.isBefore(toLT)){
+					canInsert = false;
+				}
+			}
+		}
+		if(!canInsert){
+			return false;
+		}
+		return true;
 	}
 
 	public boolean isApplicable(PresentationState s, PresentationOperator o, LinkedList<PresentationOperator> operators) {
@@ -168,6 +241,7 @@ public class PresentationOperator {
 				if (tabla[i][j] != 0) {
 					newTabla[i][j] = tabla[i][j];
 				}
+				
 			}
 		}
 		for (int i = 0; i < newTabla[randomInt].length; i++) {
@@ -186,6 +260,30 @@ public class PresentationOperator {
 			return null;
 		}
 	}
+	
+	public PresentationState applyMap(PresentationState state, PresentationOperator operator) {
+		Map<String, LinkedList<Integer>> tempMap = state.getMapTabel();
+		Map<String, LinkedList<Integer>> actualMap = new HashMap<>();
+		LinkedList<String> canInsert = new LinkedList<>();
+		for (Map.Entry<String, LinkedList<Integer>> entry : tempMap.entrySet()) {
+			actualMap.put(new String(entry.getKey()), new LinkedList<Integer>(entry.getValue()));
+		}
+		Random randomGenerator = new Random();
+		String tmp = operator.getFrom().substring(0, 11);
+		for(Map.Entry<String, LinkedList<Integer>> entry: actualMap.entrySet()){
+			if(entry.getKey().contains(tmp)){
+				canInsert.add(entry.getKey());
+			}
+		}
+		int randomInt = randomGenerator.nextInt(canInsert.size());
+		String insertStr = canInsert.get(randomInt);
+		LinkedList<Integer> inserList = actualMap.get(insertStr);
+		inserList.add(operator.getId());
+		actualMap.put(insertStr, inserList);
+		PresentationState newState = new PresentationState();
+		newState.setMapTabel(actualMap);
+		return newState;
+	}
 
 	public int getId() {
 		return id;
@@ -203,68 +301,12 @@ public class PresentationOperator {
 		this.weight = weight;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((FORMAT == null) ? 0 : FORMAT.hashCode());
-		result = prime * result + ((actor == null) ? 0 : actor.hashCode());
-		result = prime * result + ((from == null) ? 0 : from.hashCode());
-		result = prime * result + id;
-		result = prime * result + (piority ? 1231 : 1237);
-		result = prime * result + ((presentationTitle == null) ? 0 : presentationTitle.hashCode());
-		result = prime * result + ((to == null) ? 0 : to.hashCode());
-		result = prime * result + ((topic == null) ? 0 : topic.hashCode());
-		result = prime * result + weight;
-		return result;
+	public String getInter() {
+		return inter;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PresentationOperator other = (PresentationOperator) obj;
-		if (FORMAT == null) {
-			if (other.FORMAT != null)
-				return false;
-		} else if (!FORMAT.equals(other.FORMAT))
-			return false;
-		if (actor == null) {
-			if (other.actor != null)
-				return false;
-		} else if (!actor.equals(other.actor))
-			return false;
-		if (from == null) {
-			if (other.from != null)
-				return false;
-		} else if (!from.equals(other.from))
-			return false;
-		if (id != other.id)
-			return false;
-		if (piority != other.piority)
-			return false;
-		if (presentationTitle == null) {
-			if (other.presentationTitle != null)
-				return false;
-		} else if (!presentationTitle.equals(other.presentationTitle))
-			return false;
-		if (to == null) {
-			if (other.to != null)
-				return false;
-		} else if (!to.equals(other.to))
-			return false;
-		if (topic == null) {
-			if (other.topic != null)
-				return false;
-		} else if (!topic.equals(other.topic))
-			return false;
-		if (weight != other.weight)
-			return false;
-		return true;
+	public void setInter(String inter) {
+		this.inter = inter;
 	}
 
 	public PresentationState apply(PresentationState state, PresentationOperator op, LinkedList<PresentationOperator> operators) {
@@ -317,5 +359,69 @@ public class PresentationOperator {
 		else{
 			return null;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((actor == null) ? 0 : actor.hashCode());
+		result = prime * result + ((from == null) ? 0 : from.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((inter == null) ? 0 : inter.hashCode());
+		result = prime * result + (piority ? 1231 : 1237);
+		result = prime * result + ((presentationTitle == null) ? 0 : presentationTitle.hashCode());
+		result = prime * result + ((to == null) ? 0 : to.hashCode());
+		result = prime * result + ((topic == null) ? 0 : topic.hashCode());
+		result = prime * result + weight;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PresentationOperator other = (PresentationOperator) obj;
+		if (actor == null) {
+			if (other.actor != null)
+				return false;
+		} else if (!actor.equals(other.actor))
+			return false;
+		if (from == null) {
+			if (other.from != null)
+				return false;
+		} else if (!from.equals(other.from))
+			return false;
+		if (id != other.id)
+			return false;
+		if (inter == null) {
+			if (other.inter != null)
+				return false;
+		} else if (!inter.equals(other.inter))
+			return false;
+		if (piority != other.piority)
+			return false;
+		if (presentationTitle == null) {
+			if (other.presentationTitle != null)
+				return false;
+		} else if (!presentationTitle.equals(other.presentationTitle))
+			return false;
+		if (to == null) {
+			if (other.to != null)
+				return false;
+		} else if (!to.equals(other.to))
+			return false;
+		if (topic == null) {
+			if (other.topic != null)
+				return false;
+		} else if (!topic.equals(other.topic))
+			return false;
+		if (weight != other.weight)
+			return false;
+		return true;
 	}
 }

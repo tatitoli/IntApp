@@ -3,6 +3,7 @@ package app.view;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Map;
 
 import app.daoimp.PresentationsDaoImp;
 import app.model.Section;
@@ -10,7 +11,6 @@ import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
-import app.sort.TryError;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -53,42 +53,66 @@ public class MainForm extends Application {
 
 	@FXML
 	public void generateAction(ActionEvent event) throws IOException {
+		long startTime = System.currentTimeMillis();
 		PresentationsDaoImp impDao = new PresentationsDaoImp();
 		LinkedList<PresentationOperator> operators = new LinkedList<>();
-		operators = impDao.getPresentations(selectedFile);
+//		operators = impDao.getPresentations(selectedFile);
+		operators = impDao.getPresentationsInter(selectedFile);
 		section = impDao.getSection(selectedFile);
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
+		problem.setSection(section);
+		problem.setMapSize(section.getSections());
 		problem.setX(section.getSectionNumber());
 		problem.setY(operators.size());
 		int db = 0, min=Integer.MAX_VALUE;
-		while(db<11){
-			TryError tryError = new TryError(problem);
-			if(tryError.run()){
-				if(min >= tryError.GetLastCost()){
-					min = tryError.GetLastCost();
-				}
-				db++;
-			}
-		}
+//		while(db<11){
+//			TryError tryError = new TryError(problem);
+//			if(tryError.run()){
+//				if(min >= tryError.GetLastCost()){
+//					min = tryError.GetLastCost();
+//				}
+//				db++;
+//			}
+//		}
 		Optimal algorithm = new Optimal(problem,min);
 		boolean run = algorithm.run();
 		if (run == false) {
 			System.out.println("Nem lehet beosztani az elõadásokat!");
 		}
-		intTable = algorithm.GetTabla();
-		table= new Presentation[intTable.length][intTable[0].length];
-		for (int i = 0; i < intTable.length; i++) {
-			for (int j = 0; j < intTable[i].length; j++) {
+		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapTabla();
+		int maxLenght = Integer.MIN_VALUE;
+		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+			if(maxLenght < entry.getValue().size()){
+				maxLenght = entry.getValue().size();
+			}
+		}
+		table= new Presentation[section.getSectionNumber()][maxLenght];
+		int i =0;
+		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+			LinkedList<Integer> temp = entry.getValue();
+			for (int j = 0; j < temp.size(); j++) {
 				for (PresentationOperator ope : operators) {
-					if(intTable[i][j] == ope.getId()){
+					if(temp.get(j) == ope.getId()){
 						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
 								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
 						break;
 					}
 				}
 			}
+			i++;
 		}
+//		for (int i = 0; i < intTable.length; i++) {
+//			for (int j = 0; j < intTable[i].length; j++) {
+//				for (PresentationOperator ope : operators) {
+//					if(intTable[i][j] == ope.getId()){
+//						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
+//								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
+//						break;
+//					}
+//				}
+//			}
+//		}
 //		AppButton[][] buttonTable = new AppButton[section.getSectionNumber()][operators.size()];
 //		stage = new Stage();
 //		GridPane gridPane = new GridPane();
@@ -164,6 +188,9 @@ public class MainForm extends Application {
 			stage.show();
 			Stage actualStage = (Stage) generateButton.getScene().getWindow();
 			actualStage.close();
+			long endTime   = System.currentTimeMillis();
+			long totalTime = endTime - startTime;
+			System.out.println(totalTime);
 
 		} catch (IOException e) {
 			e.printStackTrace();

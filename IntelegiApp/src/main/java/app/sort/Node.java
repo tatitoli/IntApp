@@ -10,11 +10,16 @@ public class Node {
     PresentationState state;
     Node parent;
     int cost;
+    int typecost;
 
     public Node(PresentationState state, PresentationOperator op, Node parent, LinkedList<PresentationOperator> operators ) {
-        this.cost = parent == null ? 0 : getCost(state, operators) + getWeightPay(op);
+        this.cost = parent == null ? 0 : getCostMap(state, operators) + getWeightPay(op);
         this.parent = parent;
         this.state = state;
+        this.typecost = parent == null ? 0 : getCostMap(state, operators);
+//        int typecost = parent == null ? 0 : getCostMap(state, operators);
+//        this.cost = parent == null ? 0 : this.typecost + getWeightPay(op);
+
     }
 
 	private int getWeightPay(PresentationOperator op) {
@@ -26,6 +31,50 @@ public class Node {
     public String toString() {
         return state.toString();
     }
+	
+	static int getCostMap(PresentationState s, LinkedList<PresentationOperator> operators) {
+		Map<Integer, PresentationOperator> presentationMap = new HashMap<Integer, PresentationOperator>();
+		for (PresentationOperator operator : operators) {
+			presentationMap.put(operator.getId(), operator);
+		}
+		List<String> typeList = new ArrayList<>();
+		List<String> actorList = new ArrayList<>();
+		int db = 0;
+		int cost = 0;
+		Map<String, LinkedList<Integer>> temp = s.getMapTabel();
+		PresentationOperator presentation = null;
+		for (Map.Entry<String, LinkedList<Integer>> entry : temp.entrySet()) {
+			db=0;
+			typeList = new ArrayList<>();
+			actorList = new ArrayList<>();
+			LinkedList<Integer> lista = entry.getValue();
+			for (int j = 0; j < lista.size(); j++) {
+				for (PresentationOperator o : operators) {
+					if (lista.get(j) == o.getId()) {
+						presentation = o;
+						break;
+					}
+				}
+				if (!typeList.contains(presentation.getTopic())) {
+					typeList.add(presentation.getTopic());
+				}
+//				if (!actorList.contains(presentation.getActor())) {
+//					actorList.add(presentation.getActor());
+//				}
+//				if (actorList.contains(presentation.getActor())) {
+//					cost += 5;
+//				}
+			}
+			if (typeList != null) {
+				db += typeList.size() - 1;
+			}
+			if (db < 0) {
+				db = 0;
+			}
+			cost += db;
+		}
+		return cost;
+	}
 	
 	static int getCost(PresentationState s, LinkedList<PresentationOperator> operators){
 		Map<Integer, PresentationOperator> presentationMap = new HashMap<Integer, PresentationOperator>();
@@ -93,6 +142,14 @@ public class Node {
 
 	public void setCost(int cost) {
 		this.cost = cost;
+	}
+
+	public int getTypecost() {
+		return typecost;
+	}
+
+	public void setTypecost(int typecost) {
+		this.typecost = typecost;
 	}
 
 	@Override

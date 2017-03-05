@@ -7,6 +7,7 @@ package app.sort;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Optimal {
 
@@ -30,14 +31,15 @@ public class Optimal {
 	public boolean run() {
 		closedNodes = new LinkedList<>();
 		openNodes = new LinkedList<>();
-		openNodes.add(new Node(p.startState(), null, null, null));
+//		openNodes.add(new Node(p.startState(), null, null, null));
+		openNodes.add(new Node(p.startMapState(PresentationProblem.operators), null, null, null));
 		while (true) {
 			if (openNodes.isEmpty()) {
 				return false;
 			}
 
 			node = openNodes.remove(getLowCostNode(openNodes));
-			if (node.state.isGoal(p)) {
+			if (node.state.isGoalMap(p)) {
 				return true;
 			}
 
@@ -49,19 +51,19 @@ public class Optimal {
 						break;
 					}
 				}
-				if (op.isApplicable(node.state, op, PresentationProblem.operators)) {
-					PresentationState newState = op.apply(node.state, op);
+//				if (op.isApplicable(node.state, op, PresentationProblem.operators)) {
+				if (op.isApplicableMap(node.state, op, PresentationProblem.operators,p.getSection())) {	
+					PresentationState newState = op.applyMap(node.state, op);
 					if (newState != null) {
-						if (search(closedNodes, newState)) {
+						if (searchMap(closedNodes, newState)) {
 							continue;
 						}
 						Node newNode = null;
 						newNode = new Node(newState, op, node, PresentationProblem.operators);
-						if(newNode.getCost() > min){
-							closedNodes.add(newNode);
-						}else{
-							openNodes.addLast(newNode);
+						if(newNode.typecost > 3){
+							continue;
 						}
+						openNodes.add(newNode);
 					}
 				}
 			}
@@ -120,6 +122,17 @@ public class Optimal {
 		}
 		return false;
 	}
+	
+	private boolean searchMap(List<Node> nodeList, PresentationState state) {
+		Map<String, LinkedList<Integer>> actualMap = state.getMapTabel();
+		for (Node node : nodeList) {
+			Map<String, LinkedList<Integer>> nodeStateMap = node.getState().getMapTabel();
+			if(nodeStateMap.equals(actualMap)){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public String getGoal() {
 		return (String) node.state.getGoal();
@@ -127,5 +140,9 @@ public class Optimal {
 
 	public int[][] GetTabla() {
 		return node.state.getTable();
+	}
+	
+	public Map<String, LinkedList<Integer>> GetMapTabla() {
+		return node.state.getMapTabel();
 	}
 }

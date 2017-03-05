@@ -149,7 +149,8 @@ public class TableControl {
 				Date time = null;
 				if (table[i][j] != null) {
 					try {
-						time = formatter.parse(table[i][j].getFrom());
+						String[] tmp = table[i][j].getFrom().split(" ");
+						time = formatter.parse(tmp[3]);
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}

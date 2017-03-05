@@ -45,6 +45,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 					String actor = null;
 					String topic = null;
 					String from = null;
+					String intervallum = null;
 					String to = null;
 					String fontos = null;
 					Iterator<Cell> cellIterator = row.cellIterator();
@@ -150,6 +151,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 
 	@Override
 	public Section getSection(File input) {
+		LinkedList<String> sections = new LinkedList<>();
 		Section section = null;
 		try {
 			FileInputStream file = new FileInputStream(input);
@@ -161,7 +163,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 			String to = null;
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
-				if (row.getRowNum() > 0) {
+				if (row.getRowNum() == 1) {
 					Iterator<Cell> cellIterator = row.cellIterator();
 					while (cellIterator.hasNext()) {
 						Cell cell = cellIterator.next();
@@ -177,15 +179,103 @@ public class PresentationsDaoImp implements PresentationsDao {
 							break;
 						}
 					}
+				}else if(row.getRowNum() > 1){
+					Iterator<Cell> cellIterator = row.cellIterator();
+					while (cellIterator.hasNext()) {
+						Cell cell = cellIterator.next();
+						if(cell.getStringCellValue() != null && !"".equals(cell.getStringCellValue())){
+							sections.add(cell.getStringCellValue());
+						}
+					}
 				}
+				
+				
 			}
 			file.close();
-			section = new Section(sectionNumber, from, to);
+			section = new Section(sectionNumber, from, to, sections);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return section;
+	}
+
+	@Override
+	public LinkedList<PresentationOperator> getPresentationsInter(File input) {
+		LinkedList<PresentationOperator> operators = new LinkedList<>();
+		try {
+			FileInputStream file = new FileInputStream(input);
+			HSSFWorkbook workbook = new HSSFWorkbook(file);
+			HSSFSheet sheet = workbook.getSheetAt(1);
+			int i = 1;
+			Iterator<Row> rowIterator = sheet.iterator();
+			while (rowIterator.hasNext()) {
+				Cell cell = null;
+				Row row = rowIterator.next();
+				if (row.getRowNum() > 0) {
+					String presentationTitle  = null;
+					String actor = null;
+					String topic = null;
+					String from = null;
+					String inter = null;
+					String to = null;
+					String fontos = null;
+					Iterator<Cell> cellIterator = row.cellIterator();
+					while (cellIterator.hasNext()) {
+						cell = cellIterator.next();
+						switch (cell.getColumnIndex()) {
+						case 0:
+							presentationTitle = cell.getStringCellValue();
+							break;
+						case 1:
+							actor = cell.getStringCellValue();
+							break;
+						case 2:
+							topic = cell.getStringCellValue();
+							break;
+						case 3:
+							inter = String.valueOf(cell.getNumericCellValue());
+							break;
+						case 4:
+							from = new DataFormatter().formatCellValue(cell);
+							break;
+						case 5:
+							to = new DataFormatter().formatCellValue(cell);
+							break;
+						}
+						if(cell.getColumnIndex() == 5){
+							if("Fontos".equals(fontos)){				
+								operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, true,15));
+							}else{
+								operators.add(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, false,15));
+							}
+							from =null;
+							to=null;
+						}
+						if(cell.getColumnIndex() > 5 && cell.getColumnIndex()%2 == 1){
+							to = new DataFormatter().formatCellValue(cell);
+						}
+						if(cell.getColumnIndex() > 5 && cell.getColumnIndex()%2 == 0){
+							from = new DataFormatter().formatCellValue(cell);
+						}
+						if(cell.getColumnIndex() > 5 && from != null && to !=null && !"".equals(from) && !"".equals(to)){
+							if("Fontos".equals(fontos)){				
+								operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, true,15));
+							}else{
+								operators.add(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, false,15));
+							}
+						}
+					}
+					i++;
+				}
+			}
+			file.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return operators;
 	}
 }
