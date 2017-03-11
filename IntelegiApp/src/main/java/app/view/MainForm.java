@@ -11,6 +11,7 @@ import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
+import geneticalgorythm.GeneticAlgorithm;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,7 +76,8 @@ public class MainForm extends Application {
 //				db++;
 //			}
 //		}
-		Optimal algorithm = new Optimal(problem,min);
+//		Optimal algorithm = new Optimal(problem,min);
+		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
 		boolean run = algorithm.run();
 		if (run == false) {
 			System.out.println("Nem lehet beosztani az elõadásokat!");

@@ -86,6 +86,4 @@ public class PresentationProblem{
 	public void setSection(Section section) {
 		this.section = section;
 	}
-	
-	
 }

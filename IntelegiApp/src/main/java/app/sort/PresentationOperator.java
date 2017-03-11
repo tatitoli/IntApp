@@ -28,6 +28,7 @@ public class PresentationOperator {
 	private String to;
 	private boolean piority;
 	private int weight;
+	private LinkedList<String> insertPos;
 
 	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String to,
 			boolean piority, int weight) {
@@ -59,8 +60,9 @@ public class PresentationOperator {
 		this.piority = piority;
 		this.weight = weight;
 	}
-	
+
 	public boolean isApplicableMap(PresentationState s, PresentationOperator o, LinkedList<PresentationOperator> operators, Section section){
+		insertPos = new LinkedList<>();
 		Map<String, LinkedList<Integer>> presentationMap = new HashMap<>();
 		presentationMap = s.getMapTabel();
 		boolean canInsert = true;
@@ -101,7 +103,12 @@ public class PresentationOperator {
 				LocalTime toLT = LocalTime.parse(to[3], formatter);
 				if(!localtime.isAfter(fromLT) || !localtime.isBefore(toLT)){
 					canInsert = false;
+				}else{
+					insertPos.add(entry.getKey());
 				}
+			}
+			if(idList.size()==0){
+				insertPos.add(entry.getKey());
 			}
 		}
 		if(!canInsert){
@@ -261,25 +268,70 @@ public class PresentationOperator {
 		}
 	}
 	
-	public PresentationState applyMap(PresentationState state, PresentationOperator operator) {
+	public PresentationState applyMap(PresentationState state, PresentationOperator operator, Section section, LinkedList<PresentationOperator> operators) {
 		Map<String, LinkedList<Integer>> tempMap = state.getMapTabel();
 		Map<String, LinkedList<Integer>> actualMap = new HashMap<>();
 		LinkedList<String> canInsert = new LinkedList<>();
+		String insertKey = null;
+		boolean next = false;
+		boolean insert = false;
 		for (Map.Entry<String, LinkedList<Integer>> entry : tempMap.entrySet()) {
 			actualMap.put(new String(entry.getKey()), new LinkedList<Integer>(entry.getValue()));
 		}
-		Random randomGenerator = new Random();
-		String tmp = operator.getFrom().substring(0, 11);
-		for(Map.Entry<String, LinkedList<Integer>> entry: actualMap.entrySet()){
-			if(entry.getKey().contains(tmp)){
-				canInsert.add(entry.getKey());
+//		Random randomGenerator = new Random();
+//		String tmp = operator.getFrom().substring(0, 11);
+//		for(Map.Entry<String, LinkedList<Integer>> entry: actualMap.entrySet()){
+//			if(entry.getKey().contains(tmp)){
+//				canInsert.add(entry.getKey());
+//			}
+//		}
+		LocalTime localtime = null;
+		for (Map.Entry<String, LinkedList<Integer>> entry : actualMap.entrySet()) {
+			LinkedList<Integer> idList = entry.getValue();
+			if(next){
+				insertKey = entry.getKey();
+				break;
+			}
+			if(idList.size()!=0){
+				String tmp = operator.getFrom().substring(0, 10);
+				if(entry.getKey().contains(tmp)){
+					localtime = LocalTime.parse(section.getFrom(), formatter);
+					PresentationOperator actualPresentation = null;
+					for (int i = 0; i < idList.size(); i++) {
+						for (PresentationOperator op : operators) {
+							if(idList.contains(op.getId())){
+								actualPresentation = op;
+								String tmpInter = actualPresentation.getInter();
+								String[] interArray = tmpInter.split("\\.");
+								localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+							}
+						}
+					}
+				}
+				String tmpInter = operator.getInter();
+				String[] interArray = tmpInter.split("\\.");
+				localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+				String[] from = operator.getFrom().split(" ");
+				String[] to = operator.getTo().split(" ");
+				LocalTime fromLT = LocalTime.parse(from[3], formatter);
+				LocalTime toLT = LocalTime.parse(to[3], formatter);
+				if(localtime.isAfter(fromLT) || localtime.isBefore(toLT)){
+					insert = true;
+					insertKey = entry.getKey();
+					break;
+				}
+			}else{
+				if(insert){
+					break;
+				}else
+				next=true;
 			}
 		}
-		int randomInt = randomGenerator.nextInt(canInsert.size());
-		String insertStr = canInsert.get(randomInt);
-		LinkedList<Integer> inserList = actualMap.get(insertStr);
+//		int randomInt = randomGenerator.nextInt(insertPos.size());
+//		String insertStr = insertPos.get(randomInt);
+		LinkedList<Integer> inserList = actualMap.get(insertKey);
 		inserList.add(operator.getId());
-		actualMap.put(insertStr, inserList);
+		actualMap.put(insertKey, inserList);
 		PresentationState newState = new PresentationState();
 		newState.setMapTabel(actualMap);
 		return newState;

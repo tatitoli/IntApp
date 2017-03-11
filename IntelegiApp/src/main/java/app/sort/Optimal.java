@@ -53,7 +53,7 @@ public class Optimal {
 				}
 //				if (op.isApplicable(node.state, op, PresentationProblem.operators)) {
 				if (op.isApplicableMap(node.state, op, PresentationProblem.operators,p.getSection())) {	
-					PresentationState newState = op.applyMap(node.state, op);
+					PresentationState newState = op.applyMap(node.state, op, p.getSection(), PresentationProblem.operators);
 					if (newState != null) {
 						if (searchMap(closedNodes, newState)) {
 							continue;

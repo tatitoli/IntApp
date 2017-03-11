@@ -1,13 +1,18 @@
 package app.sort;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class PresentationState{
+import app.model.Section;
 
+public class PresentationState {
+	DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 	private int[][] table;
 	private Map<String, LinkedList<Integer>> mapTabel;
 
@@ -18,13 +23,13 @@ public class PresentationState{
 	public PresentationState() {
 	}
 
-	public PresentationState(LinkedList<PresentationOperator> operators, LinkedList<String >sections) {
+	public PresentationState(LinkedList<PresentationOperator> operators, LinkedList<String> sections) {
 		mapTabel = new HashMap<>();
 		for (PresentationOperator presentationOperator : operators) {
 			String tmp = presentationOperator.getFrom().substring(0, 11);
-			for (String string : sections){
-				if(!mapTabel.containsKey(string+"_"+tmp)){
-					mapTabel.put(string+"_"+tmp, new LinkedList<Integer>());
+			for (String string : sections) {
+				if (!mapTabel.containsKey(string + "_" + tmp)) {
+					mapTabel.put(string + "_" + tmp, new LinkedList<Integer>());
 				}
 			}
 		}
@@ -38,20 +43,20 @@ public class PresentationState{
 	public boolean isGoalMap(PresentationProblem p) {
 		ArrayList<Integer> pIds = (ArrayList<Integer>) p.getPresentationIds();
 		ArrayList<Integer> actualId = new ArrayList<>();
-		Map<String, LinkedList<Integer>> tempMap = getMapTabel(); 
+		Map<String, LinkedList<Integer>> tempMap = getMapTabel();
 		for (Map.Entry<String, LinkedList<Integer>> entry : tempMap.entrySet()) {
 			actualId.addAll(entry.getValue());
 		}
 		return actualId.containsAll(pIds);
 	}
-	
+
 	public boolean isGoal(PresentationProblem p) {
 		ArrayList<Integer> pIds = (ArrayList<Integer>) p.getPresentationIds();
 		ArrayList<Integer> actualId = new ArrayList<>();
 		int tabla[][] = getTable();
 		for (int i = 0; i < tabla.length; i++) {
 			for (int j = 0; j < tabla[i].length; j++) {
-				if (tabla[i][j]!=0 && pIds.contains(tabla[i][j])) {
+				if (tabla[i][j] != 0 && pIds.contains(tabla[i][j])) {
 					actualId.add(tabla[i][j]);
 				}
 			}
@@ -111,6 +116,37 @@ public class PresentationState{
 				return false;
 		} else if (!mapTabel.equals(other.mapTabel))
 			return false;
+		return true;
+	}
+
+	public boolean checkState(Map<String, LinkedList<Integer>> stateMap, LinkedList<PresentationOperator> operators, Section section) {
+		LocalTime localtime = null;
+		for (Map.Entry<String, LinkedList<Integer>> entry : stateMap.entrySet()) {
+			LinkedList<Integer> idList = entry.getValue();
+			localtime = LocalTime.parse(section.getFrom(), formatter);
+			PresentationOperator actualPresentation = null;
+			for (int i = 0; i < idList.size(); i++) {
+				for (PresentationOperator operator : operators) {
+					if (idList.contains(operator.getId())) {
+						actualPresentation = operator;
+						break;
+					}
+				}
+				String[] from = actualPresentation.getFrom().split(" ");
+				String[] to = actualPresentation.getTo().split(" ");
+				LocalTime fromLT = LocalTime.parse(from[3], formatter);
+				fromLT = fromLT.plusNanos(1);
+				LocalTime toLT = LocalTime.parse(to[3], formatter);
+				if (localtime.isBefore(fromLT) || localtime.isBefore(toLT)) {
+					String tmpInter = actualPresentation.getInter();
+					String[] interArray = tmpInter.split("\\.");
+					localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+				}
+				else{
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 }
