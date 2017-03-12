@@ -22,6 +22,7 @@ public class GeneticAlgorithm {
 	LinkedList<Parent> parentList;
 	LinkedList<Parent> childrenList;
 	PresentationProblem p;
+	boolean first = true;
 	int min;
 	PresentationProblem seged;
 
@@ -43,23 +44,23 @@ public class GeneticAlgorithm {
 		Map<String, LinkedList<Integer>> childrenMap = new HashMap<>();
 		initalizeStartParents(p.getOperators());
 		getCostMap(parentList, p.getOperators());
-		Collections.sort(parentList, new Comparator<Parent>(){
+		Collections.sort(parentList, new Comparator<Parent>() {
 			@Override
 			public int compare(Parent o1, Parent o2) {
-				if(o1.getCost() < o2.getCost()){
-			           return -1; 
-			        }
-			        if(o1.getCost() >  o2.getCost()){
-			           return 1; 
-			        }
+				if (o1.getCost() < o2.getCost()) {
+					return -1;
+				}
+				if (o1.getCost() > o2.getCost()) {
+					return 1;
+				}
 				return 0;
 			}
-			}); 
-//		int index = getLowCost(parentList);
+		});
+		// int index = getLowCost(parentList);
 		childrenList.add(parentList.get(0));
 		childrenList.add(parentList.get(1));
 		boolean change = false;
-		int tryred =0;
+		int tryred = 0;
 		while (true) {
 			for (int i = 0; i < parentList.size(); i++) {
 				if (i % 2 == 0) {
@@ -98,19 +99,19 @@ public class GeneticAlgorithm {
 				p2List = new LinkedList<>();
 				p1 = null;
 				p2 = null;
-				if(childrenList.size() == 10){
+				if (childrenList.size() == 10) {
 					change = true;
 					break;
 				}
 			}
-			if(change){
+			if (change) {
 				parentList = new LinkedList<>();
 				for (int i = 0; i < childrenList.size(); i++) {
 					PresentationState tmpState = childrenList.get(i).getParentState();
 					Map<String, LinkedList<Integer>> tmpM = tmpState.getMapTabel();
 					Map<String, LinkedList<Integer>> insertMap = new HashMap<>();
 					for (Map.Entry<String, LinkedList<Integer>> map : tmpM.entrySet()) {
-						insertMap.put(new String(map.getKey()),new LinkedList<>(map.getValue()));
+						insertMap.put(new String(map.getKey()), new LinkedList<>(map.getValue()));
 					}
 					PresentationState insertState = new PresentationState();
 					insertState.setMapTabel(insertMap);
@@ -120,24 +121,24 @@ public class GeneticAlgorithm {
 				childrenList = new LinkedList<>();
 				change = false;
 				getCostMap(parentList, p.getOperators());
-				Collections.sort(parentList, new Comparator<Parent>(){
+				Collections.sort(parentList, new Comparator<Parent>() {
 					@Override
 					public int compare(Parent o1, Parent o2) {
-						if(o1.getCost() < o2.getCost()){
-					           return -1; 
-					        }
-					        if(o1.getCost() >  o2.getCost()){
-					           return 1; 
-					        }
+						if (o1.getCost() < o2.getCost()) {
+							return -1;
+						}
+						if (o1.getCost() > o2.getCost()) {
+							return 1;
+						}
 						return 0;
 					}
-					}); 
-//				index = getLowCost(parentList);
+				});
+				// index = getLowCost(parentList);
 				childrenList.add(parentList.get(0));
 				childrenList.add(parentList.get(1));
 				tryred++;
 			}
-			if(tryred == 101){
+			if (childrenList.get(0).getCost() <= 2) {
 				return false;
 			}
 		}
@@ -195,28 +196,53 @@ public class GeneticAlgorithm {
 	}
 
 	private LinkedList<Integer> kivalasztas(LinkedList<Integer> p1List, LinkedList<Integer> p2List) {
-		LinkedList<Integer> tmpList = new LinkedList<>();
-		LinkedList<Integer> reverseList = new LinkedList<>();
-		for (int i = 0; i < p2List.size(); i++) {
-			reverseList.addFirst(p2List.get(i));
-		}
-		for (int i = 0; i < p1List.size(); i++) {
-			if (i % 2 == 0 && !tmpList.contains(p1List.get(i))) {
-				tmpList.addFirst(p1List.get(i));
+		if (first) {
+			LinkedList<Integer> tmpList = new LinkedList<>();
+			LinkedList<Integer> reverseList = new LinkedList<>();
+			for (int i = 0; i < p2List.size(); i++) {
+				reverseList.addFirst(p2List.get(i));
 			}
-			if (i % 2 == 1 && !tmpList.contains(reverseList.get(i))) {
-				tmpList.addLast(reverseList.get(i));
-			}
-		}
-		if (!p1List.contains(tmpList)) {
 			for (int i = 0; i < p1List.size(); i++) {
-				if (!tmpList.contains(p1List.get(i))) {
-					tmpList.add(p1List.get(i));
+				if (i % 2 == 0 && !tmpList.contains(p1List.get(i))) {
+					tmpList.addFirst(p1List.get(i));
+				}
+				if (i % 2 == 1 && !tmpList.contains(reverseList.get(i))) {
+					tmpList.addLast(reverseList.get(i));
 				}
 			}
+			if (!p1List.contains(tmpList)) {
+				for (int i = 0; i < p1List.size(); i++) {
+					if (!tmpList.contains(p1List.get(i))) {
+						tmpList.add(p1List.get(i));
+					}
+				}
+			}
+			first = false;
+			return tmpList;
+		} else {
+			LinkedList<Integer> tmpList = new LinkedList<>();
+			LinkedList<Integer> reverseList = new LinkedList<>();
+			for (int i = 0; i < p1List.size(); i++) {
+				reverseList.addFirst(p1List.get(i));
+			}
+			for (int i = 0; i < p2List.size(); i++) {
+				if (i % 2 == 0 && !tmpList.contains(p2List.get(i))) {
+					tmpList.addFirst(p2List.get(i));
+				}
+				if (i % 2 == 1 && !tmpList.contains(reverseList.get(i))) {
+					tmpList.addLast(reverseList.get(i));
+				}
+			}
+			if (!p2List.contains(tmpList)) {
+				for (int i = 0; i < p2List.size(); i++) {
+					if (!tmpList.contains(p2List.get(i))) {
+						tmpList.add(p2List.get(i));
+					}
+				}
+			}
+			first = true;
+			return tmpList;
 		}
-		return tmpList;
-
 	}
 
 	public void initalizeStartParents(LinkedList<PresentationOperator> operators) {
@@ -256,9 +282,9 @@ public class GeneticAlgorithm {
 	private Map<String, LinkedList<Integer>> keresztezes(Map<Integer, String> p1Map, Map<Integer, String> p2Map,
 			LinkedList<Integer> selectedList, LinkedList<String> sections) {
 		Map<String, LinkedList<Integer>> tmpMap = new HashMap<>();
-//		for (int i = 0; i < sections.size(); i++) {
-//			tmpMap.put(sections.get(i), new LinkedList<>());
-//		}
+		// for (int i = 0; i < sections.size(); i++) {
+		// tmpMap.put(sections.get(i), new LinkedList<>());
+		// }
 		for (Map.Entry<Integer, String> entry : p1Map.entrySet()) {
 			{
 				if (!tmpMap.containsKey(entry.getValue())) {
@@ -293,8 +319,9 @@ public class GeneticAlgorithm {
 		}
 		return tmpMap;
 	}
-	
-	public boolean checkState(Map<String, LinkedList<Integer>> stateMap, LinkedList<PresentationOperator> operators, Section section) {
+
+	public boolean checkState(Map<String, LinkedList<Integer>> stateMap, LinkedList<PresentationOperator> operators,
+			Section section) {
 		LocalTime localtime = null;
 		for (Map.Entry<String, LinkedList<Integer>> entry : stateMap.entrySet()) {
 			LinkedList<Integer> idList = entry.getValue();
@@ -316,15 +343,14 @@ public class GeneticAlgorithm {
 					String tmpInter = actualPresentation.getInter();
 					String[] interArray = tmpInter.split("\\.");
 					localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
-				}
-				else{
+				} else {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
-	
+
 	public Map<String, LinkedList<Integer>> GetMapTabla() {
 		return childrenList.get(0).getParentState().getMapTabel();
 	}
