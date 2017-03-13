@@ -138,7 +138,7 @@ public class GeneticAlgorithm {
 				childrenList.add(parentList.get(1));
 				tryred++;
 			}
-			if (childrenList.get(0).getCost() <= 2) {
+			if (tryred > 10000) {
 				return false;
 			}
 		}
@@ -157,11 +157,12 @@ public class GeneticAlgorithm {
 	}
 
 	public void getCostMap(LinkedList<Parent> parent, LinkedList<PresentationOperator> operators) {
+		List<String> typeList = new ArrayList<>();
 		Map<Integer, PresentationOperator> presentationMap = new HashMap<Integer, PresentationOperator>();
 		for (PresentationOperator operator : operators) {
 			presentationMap.put(operator.getId(), operator);
 		}
-		List<String> typeList = new ArrayList<>();
+		typeList = new ArrayList<>();
 		int db = 0;
 		int cost = 0;
 		for (int i = 0; i < parent.size(); i++) {
@@ -322,9 +323,21 @@ public class GeneticAlgorithm {
 
 	public boolean checkState(Map<String, LinkedList<Integer>> stateMap, LinkedList<PresentationOperator> operators,
 			Section section) {
+		boolean hasNullSection = false;
+		int typeNumber = 0;
+		List<String> typeList = new ArrayList<>();
+		for (PresentationOperator operator : operators) {
+			if(!typeList.contains(operator.getTopic())){
+				typeList.add(operator.getTopic());
+			}
+		}
+		typeNumber = typeList.size();
 		LocalTime localtime = null;
 		for (Map.Entry<String, LinkedList<Integer>> entry : stateMap.entrySet()) {
 			LinkedList<Integer> idList = entry.getValue();
+			if(idList.size()<1 || idList.isEmpty()){
+				hasNullSection = true;
+			}
 			localtime = LocalTime.parse(section.getFrom(), formatter);
 			PresentationOperator actualPresentation = null;
 			for (int i = 0; i < idList.size(); i++) {
@@ -347,6 +360,9 @@ public class GeneticAlgorithm {
 					return false;
 				}
 			}
+		}
+		if((section.getSectionNumber() <= typeNumber) && hasNullSection){
+			return false;
 		}
 		return true;
 	}
