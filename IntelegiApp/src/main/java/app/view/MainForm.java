@@ -7,7 +7,6 @@ import java.util.Map;
 
 import app.daoimp.PresentationsDaoImp;
 import app.model.Section;
-import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
@@ -79,9 +78,9 @@ public class MainForm extends Application {
 //		Optimal algorithm = new Optimal(problem,min);
 		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
 		boolean run = algorithm.run();
-		if (run == false) {
-			System.out.println("Nem lehet beosztani az elõadásokat!");
-		}
+//		if (run == false) {
+//			System.out.println("Nem lehet beosztani az elõadásokat!");
+//		}
 		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapTabla();
 		int maxLenght = Integer.MIN_VALUE;
 		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
@@ -97,7 +96,7 @@ public class MainForm extends Application {
 				for (PresentationOperator ope : operators) {
 					if(temp.get(j) == ope.getId()){
 						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
-								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
+								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
 						break;
 					}
 				}

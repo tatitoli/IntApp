@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 
 import app.model.AppButton;
 import app.model.Section;
@@ -15,6 +19,7 @@ import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
 import app.sort.TryError;
+import geneticalgorythm.GeneticAlgorithm;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -34,8 +39,7 @@ import javafx.stage.Stage;
 
 public class TableControl {
 	
-	final String FORMAT = "mm:ss";
-	DateFormat formatter = new SimpleDateFormat(FORMAT);
+	DateTimeFormatter formatterDateTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 	LinkedList<PresentationOperator> operatorsTab = new LinkedList<>();
 	Section sectionTab;
 	int[][] intTable;
@@ -138,23 +142,22 @@ public class TableControl {
 				}
 			}
 		}
-		Date del = null;
-		try {
-			del = formatter.parse("12:00");
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		}
+		LocalTime del = null;
+		//			del = formatter.parse("12:00");
+		del = LocalTime.parse("12:00", formatterDateTime);
+		
 		for (int i = 0; i < table.length; i++) {
+			LocalTime localtime = LocalTime.parse(section.getFrom(), formatterDateTime);
 			for (int j = 0; j < table[i].length; j++) {
-				Date time = null;
 				if (table[i][j] != null) {
-					try {
-						String[] tmp = table[i][j].getFrom().split(" ");
-						time = formatter.parse(tmp[3]);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					if(time.before(del)){
+					String tmpInter = table[i][j].getInter();
+					String[] interArray = tmpInter.split("\\.");
+					localtime.plusMinutes(Integer.parseInt(interArray[0]));
+					String[] from = table[i][j].getFrom().split(" ");
+					LocalTime fromLT = LocalTime.parse(from[3], formatterDateTime);
+//						String[] tmp = table[i][j].getFrom().split(" ");
+//						time = formatter.parse(tmp[3]);
+					if(localtime.isBefore(del) && fromLT.isBefore(del)){
 						insertDelelott(i, buttonTable[i][j]);
 					}else{
 						insertDelutan(i, buttonTable[i][j]);
@@ -231,36 +234,66 @@ public class TableControl {
 		LinkedList<PresentationOperator> newOperatorList = new LinkedList<>();
 		newOperatorList = updateOperatorList(operatorsTab);
 		PresentationProblem.setOperators(newOperatorList);
+		problem.setSection(sectionTab);
+		problem.setMapSize(sectionTab.getSections());
 		problem.setX(sectionTab.getSectionNumber());
 		problem.setY(operatorsTab.size());
-		int db = 0, min=Integer.MAX_VALUE;
-		while(db<11){
-			TryError tryError = new TryError(problem);
-			if(tryError.run()){
-				if(min <= tryError.GetLastCost()){
-					min = tryError.GetLastCost();
-				}
-				db++;
+//		int db = 0, min=Integer.MAX_VALUE;
+//		while(db<11){
+//			TryError tryError = new TryError(problem);
+//			if(tryError.run()){
+//				if(min <= tryError.GetLastCost()){
+//					min = tryError.GetLastCost();
+//				}
+//				db++;
+//			}
+//		}
+		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
+		boolean run = algorithm.run();
+//		if (run == false) {
+//			System.out.println("Nem lehet beosztani az elõadásokat!");
+//		}
+		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapTabla();
+		int maxLenght = Integer.MIN_VALUE;
+		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+			if(maxLenght < entry.getValue().size()){
+				maxLenght = entry.getValue().size();
 			}
 		}
-		Optimal algorithm = new Optimal(problem,min);
-		boolean run = algorithm.run();
-		if (run == false) {
-			System.out.println("Nem lehet beosztani az elõadásokat!");
-		}
-		intTable = algorithm.GetTabla();
-		tableMod= new Presentation[intTable.length][intTable[0].length];
-		for (int i = 0; i < intTable.length; i++) {
-			for (int j = 0; j < intTable[i].length; j++) {
-				for (PresentationOperator ope : operatorsTab) {
-					if(intTable[i][j] == ope.getId()){
+//		Optimal algorithm = new Optimal(problem,min);
+//		boolean run = algorithm.run();
+//		if (run == false) {
+//			System.out.println("Nem lehet beosztani az elõadásokat!");
+//		}
+//		intTable = algorithm.GetTabla();
+
+//		tableMod= new Presentation[intTable.length][intTable[0].length];
+		tableMod= new Presentation[sectionTab.getSectionNumber()][maxLenght];
+		int i =0;
+		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+			LinkedList<Integer> temp = entry.getValue();
+			for (int j = 0; j < temp.size(); j++) {
+				for (PresentationOperator ope : newOperatorList) {
+					if(temp.get(j) == ope.getId()){
 						tableMod[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
-								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
+								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
 						break;
 					}
 				}
 			}
+			i++;
 		}
+//		for (int i = 0; i < intTable.length; i++) {
+//			for (int j = 0; j < intTable[i].length; j++) {
+//				for (PresentationOperator ope : operatorsTab) {
+//					if(intTable[i][j] == ope.getId()){
+//						tableMod[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
+//								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
+//						break;
+//					}
+//				}
+//			}
+//		}
 		
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainForm.class.getResource("/Table.fxml"));
@@ -330,13 +363,9 @@ public class TableControl {
 		}
 	}
 	
-	private void setGrids(Presentation[][] table){
-		Date del = null;
-		try {
-			del = formatter.parse("12:00");
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		}
+	private void setGrids(Presentation[][] table) throws ParseException{
+		LocalTime del = null;
+		del = LocalTime.parse("12:00", formatterDateTime);
 		AppButton[][] buttonTable = new AppButton[table.length][table[0].length];
 		for (int i = 0; i < table.length; i++) {
 			for (int j = 0; j < table[i].length; j++) {
@@ -366,15 +395,13 @@ public class TableControl {
 			}
 		}
 		for (int i = 0; i < table.length; i++) {
+			LocalTime localtime = LocalTime.parse("08:00", formatterDateTime);
 			for (int j = 0; j < table[i].length; j++) {
-				Date time = null;
 				if (table[i][j] != null) {
-					try {
-						time = formatter.parse(table[i][j].getFrom());
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					if(time.before(del)){
+					String tmpInter = table[i][j].getInter();
+					String[] interArray = tmpInter.split("\\.");
+					localtime.plusMinutes(Integer.parseInt(interArray[0]));
+					if(localtime.isBefore(del)){
 						insertDelelott(i, buttonTable[i][j]);
 					}else{
 						insertDelutan(i, buttonTable[i][j]);

@@ -138,7 +138,7 @@ public class GeneticAlgorithm {
 				childrenList.add(parentList.get(1));
 				tryred++;
 			}
-			if (tryred > 10000) {
+			if (tryred > 25000) {
 				return false;
 			}
 		}
@@ -157,6 +157,7 @@ public class GeneticAlgorithm {
 	}
 
 	public void getCostMap(LinkedList<Parent> parent, LinkedList<PresentationOperator> operators) {
+		Map<String, LinkedList<String>> costMap = new HashMap<>();
 		List<String> typeList = new ArrayList<>();
 		Map<Integer, PresentationOperator> presentationMap = new HashMap<Integer, PresentationOperator>();
 		for (PresentationOperator operator : operators) {
@@ -179,6 +180,10 @@ public class GeneticAlgorithm {
 							presentation = o;
 							break;
 						}
+					}
+					//Folytatás
+					if(!costMap.containsKey(presentation.getTopic())){
+						costMap.put(presentation.getTopic(), new LinkedList<>());
 					}
 					if (!typeList.contains(presentation.getTopic())) {
 						typeList.add(presentation.getTopic());

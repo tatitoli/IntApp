@@ -9,11 +9,12 @@ public class Presentation {
 	private String to;
 	private boolean poirity;
 	private int weight;
+	private String inter;
 	
 	public Presentation(){
 	}
 
-	public Presentation(int id ,String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight) {
+	public Presentation(int id ,String presentationTitle, String actor, String topic, String from, String to, boolean piority, int weight, String inter) {
 		super();
 		this.id = id;
 		this.presentationTitle = presentationTitle;
@@ -23,6 +24,7 @@ public class Presentation {
 		this.to = to;
 		this.poirity = piority;
 		this.weight = weight;
+		this.inter = inter;
 	}
 
 	@Override
@@ -142,6 +144,15 @@ public class Presentation {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+
+	public String getInter() {
+		return inter;
+	}
+
+	public void setInter(String inter) {
+		this.inter = inter;
 	}
 
 	@Override
