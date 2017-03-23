@@ -2,23 +2,18 @@ package app.view;
 
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
 
 import app.model.AppButton;
 import app.model.Section;
-import app.sort.Optimal;
 import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
-import app.sort.TryError;
 import geneticalgorythm.GeneticAlgorithm;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -127,6 +122,7 @@ public class TableControl {
 					}
 					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
 					tableMod[i][j] = table[i][j]; 
+
 				}
 			}
 		}
@@ -170,12 +166,24 @@ public class TableControl {
 				if (tableDelelott[i][j] != null) {
 					gridOne.add(tableDelelott[i][j], i, j);
 				}
+				else if(j == 0 && tableDelelott[i][j] == null){
+					AppButton button = new AppButton(Integer.MAX_VALUE);
+					button.setText("Nincs elõadás");
+					button.setPrefSize(100, 75);
+					gridOne.add(button, i, j);
+				}
 			}
 		}
 		for (int i = 0; i < tableDelutan.length; i++) {
 				for (int j = 0; j < tableDelutan[i].length; j++) {
 					if (tableDelutan[i][j] != null) {
 						gridTwo.add(tableDelutan[i][j], i, j);
+					}
+					else if(j == 0 && tableDelutan[i][j] == null){
+						AppButton button = new AppButton(Integer.MAX_VALUE);
+						button.setText("Nincs elõadás");
+						button.setPrefSize(100, 75);
+						gridTwo.add(button, i, j);
 					}
 				}
 		}

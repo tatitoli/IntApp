@@ -8,6 +8,7 @@ public class Section {
 	private String from;
 	private String to;
 	private LinkedList<String> sections;
+	private int days;
 	
 	public Section(int sectionNumber, String from, String to) {
 		super();
@@ -22,6 +23,23 @@ public class Section {
 		this.from = from;
 		this.to = to;
 		this.sections = sections;
+	}
+
+	public Section(int sectionNumber, String from, String to, LinkedList<String> sections, int days) {
+		super();
+		this.sectionNumber = sectionNumber;
+		this.from = from;
+		this.to = to;
+		this.sections = sections;
+		this.days = days;
+	}
+
+	public int getDays() {
+		return days;
+	}
+
+	public void setDays(int days) {
+		this.days = days;
 	}
 
 	public int getSectionNumber() {

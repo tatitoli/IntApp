@@ -152,6 +152,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 	@Override
 	public Section getSection(File input) {
 		LinkedList<String> sections = new LinkedList<>();
+		LinkedList<String> dates =  new LinkedList<>();
 		Section section = null;
 		try {
 			FileInputStream file = new FileInputStream(input);
