@@ -24,6 +24,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainForm extends Application {
+	
+	LinkedList<Presentation[][]> tableList;
 
 	Presentation[][] table;
 	int[][] intTable;
@@ -59,6 +61,7 @@ public class MainForm extends Application {
 //		operators = impDao.getPresentations(selectedFile);
 		operators = impDao.getPresentationsInter(selectedFile);
 		section = impDao.getSection(selectedFile);
+		section.setDays(getDays(operators));
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
 		problem.setSection(section);
@@ -66,112 +69,56 @@ public class MainForm extends Application {
 		problem.setX(section.getSectionNumber());
 		problem.setY(operators.size());
 		int db = 0, min=Integer.MAX_VALUE;
-//		while(db<11){
-//			TryError tryError = new TryError(problem);
-//			if(tryError.run()){
-//				if(min >= tryError.GetLastCost()){
-//					min = tryError.GetLastCost();
-//				}
-//				db++;
-//			}
-//		}
 //		Optimal algorithm = new Optimal(problem,min);
 		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
 		boolean run = algorithm.run();
 //		if (run == false) {
 //			System.out.println("Nem lehet beosztani az elõadásokat!");
 //		}
-		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapTabla();
+		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapFullTabla();
 		int maxLenght = Integer.MIN_VALUE;
 		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
 			if(maxLenght < entry.getValue().size()){
 				maxLenght = entry.getValue().size();
 			}
 		}
-		table= new Presentation[section.getSectionNumber()][maxLenght];
-		int i =0;
-		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
-			LinkedList<Integer> temp = entry.getValue();
-			for (int j = 0; j < temp.size(); j++) {
-				for (PresentationOperator ope : operators) {
-					if(temp.get(j) == ope.getId()){
-						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
-								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
-						break;
+		tableList = new LinkedList<>();
+		for(int i =0;i<section.getDays().size();i++){
+			table= new Presentation[section.getSectionNumber()][maxLenght];
+			int k = 0;
+			for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+				if(entry.getKey().contains(section.getDays().get(i))){
+					LinkedList<Integer> temp = entry.getValue();
+					for (int j = 0; j < temp.size(); j++) {
+						for (PresentationOperator ope : operators) {
+							if(temp.get(j) == ope.getId()){
+								table[k][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
+										ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
+								break;
+							}
+						}
 					}
+					k++;
 				}
 			}
-			i++;
+			tableList.add(table);
 		}
-//		for (int i = 0; i < intTable.length; i++) {
-//			for (int j = 0; j < intTable[i].length; j++) {
+//		table= new Presentation[section.getSectionNumber()*section.getDays().size()][maxLenght];
+//		int i =0;
+//		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+//			LinkedList<Integer> temp = entry.getValue();
+//			for (int j = 0; j < temp.size(); j++) {
 //				for (PresentationOperator ope : operators) {
-//					if(intTable[i][j] == ope.getId()){
+//					if(temp.get(j) == ope.getId()){
 //						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
-//								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight());
+//								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
 //						break;
 //					}
 //				}
 //			}
-//		}
-//		AppButton[][] buttonTable = new AppButton[section.getSectionNumber()][operators.size()];
-//		stage = new Stage();
-//		GridPane gridPane = new GridPane();
-//		int maxWidth=0;
-//		for (int i = 0; i < table.length; i++) {
-//			for (int j = 0; j < table[i].length; j++) {
-//				if (table[i][j] != null) {
-//					buttonTable[i][j] = new AppButton(i);
-//					buttonTable[i][j].setPresentationId(table[i][j].getId());
-//					buttonTable[i][j].setText(table[i][j].getTopic()+ "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
-//					buttonTable[i][j].setPrefSize(100, 75);
-//					if(table[i][j].isPoirity()){
-//						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
-//					}
-//					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
-//					if(j>maxWidth){
-//					}
-//				}
-//				maxWidth=i;
-//			}
-//		}
-//		for (int i = 0; i < buttonTable.length; i++) {
-//			for (int j = 0; j < buttonTable[i].length; j++) {
-//				if (buttonTable[i][j] != null) {
-//					final AppButton myButton = buttonTable[i][j];
-//					myButton.setOnAction(new EventHandler<ActionEvent>() {
-//						public void handle(ActionEvent event) {
-//							FXMLLoader loader = new FXMLLoader();
-//							loader.setLocation(ChangeForm.class.getResource("/ButtonElement.fxml"));
-//							AnchorPane fightView;
-//							try {
-//								fightView = (AnchorPane)loader.load();
-//							Stage stage = new Stage();
-//							stage.setTitle("Elõadás");
-//							Scene scene = new Scene(fightView);
-//							stage.setScene(scene);
-//							ChangeForm controller = loader.getController();
-//							controller.setPresentation(myButton.getPresentationId(), table);
-//							stage.setResizable(false);
-//							stage.show();
-//							} catch (IOException e) {
-//								e.printStackTrace();
-//							}
-//						}
-//					});
-//				}
-//			}
-//		}
-//		for (int i = 0; i < buttonTable.length; i++) {
-//			for (int j = 0; j < buttonTable[i].length; j++) {
-//				if (buttonTable[i][j] != null) {
-//					gridPane.add(buttonTable[i][j], i, j);
-//				}
-//			}
+//			i++;
 //		}
 		
-		
-		//Porba
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainForm.class.getResource("/Table.fxml"));
 		try {
@@ -184,7 +131,8 @@ public class MainForm extends Application {
 			stage.setScene(scene);
 
 			TableControl controller = loader.getController();
-			controller.setFirstGrid(table, operators, section);
+//			controller.setFirstGrid(table, operators, section);
+			controller.setFirstGrid(tableList, operators, section);
 			stage.setResizable(false);
 			stage.show();
 			Stage actualStage = (Stage) generateButton.getScene().getWindow();
@@ -196,6 +144,17 @@ public class MainForm extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private LinkedList<String> getDays(LinkedList<PresentationOperator> operators) {
+		LinkedList<String> days = new LinkedList<>();
+		for (PresentationOperator op : operators) {
+			String[] from = op.getFrom().split(" ");
+			if(!days.contains(from[0] +" "+ from[1] +" "+ from[2].replace(".", ""))){
+				days.add(from[0] +" "+ from[1] +" "+ from[2].replace(".", ""));
+			}
+		}
+		return days;
 	}
 
 	@Override

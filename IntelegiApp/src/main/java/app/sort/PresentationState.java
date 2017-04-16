@@ -29,7 +29,7 @@ public class PresentationState {
 			String tmp = presentationOperator.getFrom().substring(0, 11);
 			for (String string : sections) {
 				if (!mapTabel.containsKey(string + "_" + tmp)) {
-					mapTabel.put(string + "_" + tmp, new LinkedList<Integer>());
+					mapTabel.put(new String(string + "_" + tmp), new LinkedList<Integer>());
 				}
 			}
 		}
