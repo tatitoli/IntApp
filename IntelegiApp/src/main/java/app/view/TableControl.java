@@ -464,8 +464,7 @@ public class TableControl {
 					if (table[i][j] != null) {
 						buttonTable[i][j] = new AppButton(i);
 						buttonTable[i][j].setPresentationId(table[i][j].getId());
-						buttonTable[i][j].setText(
-								table[i][j].getTopic() + "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
+						buttonTable[i][j].setText(table[i][j].getActor());
 						buttonTable[i][j].setPrefSize(100, 75);
 						if (table[i][j].isPoirity()) {
 							buttonTable[i][j].setStyle("-fx-background-color: #96012e");

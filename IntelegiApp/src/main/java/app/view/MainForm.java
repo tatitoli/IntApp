@@ -11,6 +11,7 @@ import app.sort.Presentation;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
 import geneticalgorythm.GeneticAlgorithm;
+import geneticalgorythm.NewGenericAlgorythm;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -70,12 +71,14 @@ public class MainForm extends Application {
 		problem.setY(operators.size());
 		int db = 0, min=Integer.MAX_VALUE;
 //		Optimal algorithm = new Optimal(problem,min);
-		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
+		NewGenericAlgorythm algorithm = new NewGenericAlgorythm(problem);
+//		GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
 		boolean run = algorithm.run();
 //		if (run == false) {
 //			System.out.println("Nem lehet beosztani az elõadásokat!");
 //		}
-		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapFullTabla();
+//		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapFullTabla();
+		Map<String, LinkedList<Integer>> intMap = null;
 		int maxLenght = Integer.MIN_VALUE;
 		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
 			if(maxLenght < entry.getValue().size()){
@@ -103,21 +106,6 @@ public class MainForm extends Application {
 			}
 			tableList.add(table);
 		}
-//		table= new Presentation[section.getSectionNumber()*section.getDays().size()][maxLenght];
-//		int i =0;
-//		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
-//			LinkedList<Integer> temp = entry.getValue();
-//			for (int j = 0; j < temp.size(); j++) {
-//				for (PresentationOperator ope : operators) {
-//					if(temp.get(j) == ope.getId()){
-//						table[i][j] = new Presentation(ope.getId(), ope.getPresentationTitle(), 
-//								ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(), ope.getInter());
-//						break;
-//					}
-//				}
-//			}
-//			i++;
-//		}
 		
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainForm.class.getResource("/Table.fxml"));

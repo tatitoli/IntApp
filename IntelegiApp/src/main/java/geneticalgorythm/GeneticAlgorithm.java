@@ -334,7 +334,7 @@ public class GeneticAlgorithm {
 						String[] from = actualPresentation.getFrom().split(" ");
 						String[] to = actualPresentation.getTo().split(" ");
 						LocalTime fromLT = LocalTime.parse(from[3], formatter);
-//						fromLT = fromLT.plusNanos(1);
+						// fromLT = fromLT.plusNanos(1);
 						LocalTime toLT = LocalTime.parse(to[3], formatter);
 						if (localtime.isBefore(fromLT) || localtime.isBefore(toLT)) {
 							String tmpInter = actualPresentation.getInter();
@@ -412,6 +412,7 @@ public class GeneticAlgorithm {
 		// N szédszedés
 		boolean fel = true;
 		int border = selectedList.size() / (p.getSection().getSectionNumber());
+//		int border = 2;
 		int db = 0;
 		for (int i = 0; i < selectedList.size(); i++) {
 			if (fel && db >= border) {
@@ -458,7 +459,7 @@ public class GeneticAlgorithm {
 			LinkedList<Integer> list = entry.getValue();
 			for (int i = 0; i < list.size(); i++) {
 				for (PresentationOperator operator : p.getOperators()) {
-					if(list.get(i).equals(operator.getId())){
+					if (list.get(i).equals(operator.getId())) {
 						String[] from = operator.getFrom().split(" ");
 						String[] to = operator.getTo().split(" ");
 						LocalTime fromLT = LocalTime.parse(from[3], formatter);
@@ -467,7 +468,7 @@ public class GeneticAlgorithm {
 						break;
 					}
 				}
-				
+
 			}
 			Collections.sort(operatorList, (a, b) -> a.getFrom().compareTo(b.getFrom()));
 			list = new LinkedList<>();
@@ -476,7 +477,7 @@ public class GeneticAlgorithm {
 			}
 			tmpMapSorted.put(entry.getKey(), list);
 		}
-		return tmpMap;
+		return tmpMapSorted;
 	}
 
 	private LinkedList<Map<String, LinkedList<Integer>>> keresztezesGetTwo(Map<Integer, String> p1Map,
@@ -505,48 +506,18 @@ public class GeneticAlgorithm {
 		}
 
 		// N szédszedés
-		// boolean fel= true;
-		// int border =
-		// selectedList.size()/(p.getSection().getSectionNumber()-1);
-		// int db = 0;
-		// for (int i = 0; i < selectedList.size(); i++) {
-		// if(fel && db>=border){
-		// fel = false;
-		// db=0;
-		// }
-		// else if(!fel && db>=border){
-		// fel=true;
-		// db=0;
-		// }
-		// if(fel) {
-		// String section = p1Map.get(selectedList.get(i));
-		// LinkedList<Integer> tmpList = tmpMap.get(section);
-		// tmpList.add(selectedList.get(i));
-		// tmpMap.put(section, tmpList);
-		//
-		// section = p2Map.get(selectedList.get(i));
-		// tmpList = tmpMapInverz.get(section);
-		// tmpList.add(selectedList.get(i));
-		// tmpMapInverz.put(section, tmpList);
-		// }
-		// if (!fel) {
-		// String section = p2Map.get(selectedList.get(i));
-		// LinkedList<Integer> tmpList = tmpMap.get(section);
-		// tmpList.add(selectedList.get(i));
-		// tmpMap.put(section, tmpList);
-		//
-		// section = p1Map.get(selectedList.get(i));
-		// tmpList = tmpMapInverz.get(section);
-		// tmpList.add(selectedList.get(i));
-		// tmpMapInverz.put(section, tmpList);
-		// }
-		// db++;
-		// }
-
-		// 2 felé szedés
-		int border = selectedList.size() / 2;
+		boolean fel = true;
+		int border = selectedList.size() / (p.getSection().getSectionNumber() - 1);
+		int db = 0;
 		for (int i = 0; i < selectedList.size(); i++) {
-			if (i < border) {
+			if (fel && db >= border) {
+				fel = false;
+				db = 0;
+			} else if (!fel && db >= border) {
+				fel = true;
+				db = 0;
+			}
+			if (fel) {
 				String section = p1Map.get(selectedList.get(i));
 				LinkedList<Integer> tmpList = tmpMap.get(section);
 				tmpList.add(selectedList.get(i));
@@ -557,7 +528,7 @@ public class GeneticAlgorithm {
 				tmpList.add(selectedList.get(i));
 				tmpMapInverz.put(section, tmpList);
 			}
-			if (i >= border) {
+			if (!fel) {
 				String section = p2Map.get(selectedList.get(i));
 				LinkedList<Integer> tmpList = tmpMap.get(section);
 				tmpList.add(selectedList.get(i));
@@ -568,7 +539,35 @@ public class GeneticAlgorithm {
 				tmpList.add(selectedList.get(i));
 				tmpMapInverz.put(section, tmpList);
 			}
+			db++;
 		}
+
+		// 2 felé szedés
+		// int border = selectedList.size() / 2;
+		// for (int i = 0; i < selectedList.size(); i++) {
+		// if (i < border) {
+		// String section = p1Map.get(selectedList.get(i));
+		// LinkedList<Integer> tmpList = tmpMap.get(section);
+		// tmpList.add(selectedList.get(i));
+		// tmpMap.put(section, tmpList);
+		//
+		// section = p2Map.get(selectedList.get(i));
+		// tmpList = tmpMapInverz.get(section);
+		// tmpList.add(selectedList.get(i));
+		// tmpMapInverz.put(section, tmpList);
+		// }
+		// if (i >= border) {
+		// String section = p2Map.get(selectedList.get(i));
+		// LinkedList<Integer> tmpList = tmpMap.get(section);
+		// tmpList.add(selectedList.get(i));
+		// tmpMap.put(section, tmpList);
+		//
+		// section = p1Map.get(selectedList.get(i));
+		// tmpList = tmpMapInverz.get(section);
+		// tmpList.add(selectedList.get(i));
+		// tmpMapInverz.put(section, tmpList);
+		// }
+		// }
 		mapList.add(tmpMap);
 		mapList.add(tmpMapInverz);
 		return mapList;
@@ -595,8 +594,9 @@ public class GeneticAlgorithm {
 				String[] from = actualPresentation.getFrom().split(" ");
 				String[] to = actualPresentation.getTo().split(" ");
 				LocalTime fromLT = LocalTime.parse(from[3], formatter);
+				fromLT = fromLT.plusNanos(1);
 				LocalTime toLT = LocalTime.parse(to[3], formatter);
-				if (localtime.isAfter(fromLT) && localtime.isBefore(toLT)) {
+				if (fromLT.isAfter(localtime) || localtime.isBefore(toLT)) {
 					String tmpInter = actualPresentation.getInter();
 					String[] interArray = tmpInter.split("\\.");
 					localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
