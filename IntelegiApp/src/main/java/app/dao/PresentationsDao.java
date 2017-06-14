@@ -17,6 +17,8 @@ public interface PresentationsDao {
 	LinkedList<PresentationOperator> getPresentations(File file);
 	
 	LinkedList<PresentationOperator> getPresentationsInter(File file);
+	
+	LinkedList<PresentationOperator> getPresentationsNew(File file);
 
 	Section getSection(File input);
 }

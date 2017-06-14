@@ -30,6 +30,16 @@ public class PresentationOperator {
 	private int weight;
 	private LinkedList<String> insertPos;
 
+	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String inter) {
+		super();
+		this.id = id;
+		this.presentationTitle = presentationTitle;
+		this.actor = actor;
+		this.topic = topic;
+		this.from = from;
+		this.inter = inter;
+	}
+
 	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String to,
 			boolean piority, int weight) {
 		super();

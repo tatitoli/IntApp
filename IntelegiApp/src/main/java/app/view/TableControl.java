@@ -80,6 +80,10 @@ public class TableControl {
 	GridPane gridThreeDele = new GridPane();
 	GridPane gridThreeDelu = new GridPane();
 
+	
+	GridPane gridOne = new GridPane();
+	GridPane gridTwo = new GridPane();
+	
 	Presentation[][] tableMod;
 	AppButton[][] tableDelelott;
 	AppButton[][] tableDelutan;
@@ -100,112 +104,112 @@ public class TableControl {
 	public void initialize() {
 		Tab tab1 = new Tab();
 		tab1.setText("Elsõ nap");
-		Tab tab2 = new Tab();
-		tab2.setText("Második nap");
-		Tab tab3 = new Tab();
-		tab3.setText("Haramadik nap");
-		Tab tab4 = new Tab();
-		tab4.setText("Negyedik nap");
-		Tab tab5 = new Tab();
-		tab5.setText("Ötödik nap");
-//		GridPane TabgridPane = new GridPane();
-//		delelottButton = new Button("Délelõtt");
-//		TabgridPane.add(delelottButton, 0, 0);
-//		TabgridPane.add(gridOne, 0, 1);
-//		delutanButton = new Button("Délután");
-//		TabgridPane.add(delutanButton, 0, 2);
-//		TabgridPane.add(gridTwo, 0, 3);
-//		tab1.setContent(TabgridPane);
-//		tabPane.getTabs().add(tab1);
+//		Tab tab2 = new Tab();
+//		tab2.setText("Második nap");
+//		Tab tab3 = new Tab();
+//		tab3.setText("Haramadik nap");
+//		Tab tab4 = new Tab();
+//		tab4.setText("Negyedik nap");
+//		Tab tab5 = new Tab();
+//		tab5.setText("Ötödik nap");
+		GridPane TabgridPane = new GridPane();
+		delelottButton = new Button("Délelõtt");
+		TabgridPane.add(delelottButton, 0, 0);
+		TabgridPane.add(gridOne, 0, 1);
+		delutanButton = new Button("Délután");
+		TabgridPane.add(delutanButton, 0, 2);
+		TabgridPane.add(gridTwo, 0, 3);
+		tab1.setContent(TabgridPane);
+		tabPane.getTabs().add(tab1);
 	}
 
-//	public void setFirstGrid(Presentation[][] table, LinkedList<PresentationOperator> operators, Section section) {
-//		operatorsTab = operators;
-//		sectionTab = section;
-//		tableMod = new Presentation[table.length][table[0].length];
-//		tableDelelott = new AppButton[table.length][table[0].length];
-//		tableDelutan = new AppButton[table.length][table[0].length];
-//		AppButton[][] buttonTable = new AppButton[table.length][table[0].length];
-//		for (int i = 0; i < table.length; i++) {
-//			for (int j = 0; j < table[i].length; j++) {
-//				if (table[i][j] != null) {
-//					buttonTable[i][j] = new AppButton(i);
-//					buttonTable[i][j].setPresentationId(table[i][j].getId());
-//					buttonTable[i][j].setText(
-//							table[i][j].getTopic() + "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
-//					buttonTable[i][j].setPrefSize(100, 75);
-//					if (table[i][j].isPoirity()) {
-//						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
-//					}
-//					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
-//					tableMod[i][j] = table[i][j];
-//
-//				}
-//			}
-//		}
-//		for (int i = 0; i < buttonTable.length; i++) {
-//			for (int j = 0; j < buttonTable[i].length; j++) {
-//				if (buttonTable[i][j] != null) {
-//					final AppButton myButton = buttonTable[i][j];
-//					myButton.setOnAction(new EventHandler<ActionEvent>() {
-//						public void handle(ActionEvent event) {
-//							setPresentation(myButton.getPresentationId(), table);
-//						}
-//					});
-//				}
-//			}
-//		}
-//		LocalTime del = null;
-//		// del = formatter.parse("12:00");
-//		del = LocalTime.parse("12:00", formatterDateTime);
-//
-//		for (int i = 0; i < table.length; i++) {
-//			LocalTime localtime = LocalTime.parse(section.getFrom(), formatterDateTime);
-//			for (int j = 0; j < table[i].length; j++) {
-//				if (table[i][j] != null) {
-//					String tmpInter = table[i][j].getInter();
+	public void setFirstGrid(Presentation[][] table, LinkedList<PresentationOperator> operators, Section section) {
+		operatorsTab = operators;
+		sectionTab = section;
+		tableMod = new Presentation[table.length][table[0].length];
+		tableDelelott = new AppButton[table.length][table[0].length];
+		tableDelutan = new AppButton[table.length][table[0].length];
+		AppButton[][] buttonTable = new AppButton[table.length][table[0].length];
+		for (int i = 0; i < table.length; i++) {
+			for (int j = 0; j < table[i].length; j++) {
+				if (table[i][j] != null) {
+					buttonTable[i][j] = new AppButton(i);
+					buttonTable[i][j].setPresentationId(table[i][j].getId());
+					buttonTable[i][j].setText(
+							table[i][j].getTopic() + "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
+					buttonTable[i][j].setPrefSize(100, 75);
+					if (table[i][j].isPoirity()) {
+						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
+					}
+					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
+					tableMod[i][j] = table[i][j];
+
+				}
+			}
+		}
+		for (int i = 0; i < buttonTable.length; i++) {
+			for (int j = 0; j < buttonTable[i].length; j++) {
+				if (buttonTable[i][j] != null) {
+					final AppButton myButton = buttonTable[i][j];
+					myButton.setOnAction(new EventHandler<ActionEvent>() {
+						public void handle(ActionEvent event) {
+							setPresentation(myButton.getPresentationId(), table);
+						}
+					});
+				}
+			}
+		}
+		LocalTime del = null;
+		// del = formatter.parse("12:00");
+		del = LocalTime.parse("12:00", formatterDateTime);
+
+		for (int i = 0; i < table.length; i++) {
+			LocalTime localtime = LocalTime.parse(section.getFrom(), formatterDateTime);
+			for (int j = 0; j < table[i].length; j++) {
+				if (table[i][j] != null) {
+					String tmpInter = table[i][j].getFrom();
 //					String[] interArray = tmpInter.split("\\.");
 //					localtime.plusMinutes(Integer.parseInt(interArray[0]));
 //					String[] from = table[i][j].getFrom().split(" ");
 //					LocalTime fromLT = LocalTime.parse(from[3], formatterDateTime);
-//					// String[] tmp = table[i][j].getFrom().split(" ");
-//					// time = formatter.parse(tmp[3]);
-//					if (localtime.isBefore(del) && fromLT.isBefore(del)) {
-//						insertDelelott(i, buttonTable[i][j]);
-//					} else {
-//						insertDelutan(i, buttonTable[i][j]);
-//					}
-//				}
-//			}
-//		}
-//		for (int i = 0; i < tableDelelott.length; i++) {
-//			for (int j = 0; j < tableDelelott[i].length; j++) {
-//				if (tableDelelott[i][j] != null) {
-//					gridOne.add(tableDelelott[i][j], i, j);
-//				} else if (j == 0 && tableDelelott[i][j] == null) {
-//					AppButton button = new AppButton(Integer.MAX_VALUE);
-//					button.setText("Nincs elõadás");
-//					button.setPrefSize(100, 75);
-//					gridOne.add(button, i, j);
-//				}
-//			}
-//		}
-//		for (int i = 0; i < tableDelutan.length; i++) {
-//			for (int j = 0; j < tableDelutan[i].length; j++) {
-//				if (tableDelutan[i][j] != null) {
-//					gridTwo.add(tableDelutan[i][j], i, j);
-//				} else if (j == 0 && tableDelutan[i][j] == null) {
-//					AppButton button = new AppButton(Integer.MAX_VALUE);
-//					button.setText("Nincs elõadás");
-//					button.setPrefSize(100, 75);
-//					gridTwo.add(button, i, j);
-//				}
-//			}
-//		}
-//		tabPane.prefWidth(buttonTable.length * 100);
-//		delelottButton.setPrefWidth(buttonTable.length * 100);
-//		delutanButton.setPrefWidth(buttonTable.length * 100);
-//	}
+					// String[] tmp = table[i][j].getFrom().split(" ");
+					// time = formatter.parse(tmp[3]);
+					if ("DE".equals(tmpInter)) {
+						insertDelelott(i, buttonTable[i][j]);
+					} else {
+						insertDelutan(i, buttonTable[i][j]);
+					}
+				}
+			}
+		}
+		for (int i = 0; i < tableDelelott.length; i++) {
+			for (int j = 0; j < tableDelelott[i].length; j++) {
+				if (tableDelelott[i][j] != null) {
+					gridOne.add(tableDelelott[i][j], i, j);
+				} else if (j == 0 && tableDelelott[i][j] == null) {
+					AppButton button = new AppButton(Integer.MAX_VALUE);
+					button.setText("Nincs elõadás");
+					button.setPrefSize(100, 75);
+					gridOne.add(button, i, j);
+				}
+			}
+		}
+		for (int i = 0; i < tableDelutan.length; i++) {
+			for (int j = 0; j < tableDelutan[i].length; j++) {
+				if (tableDelutan[i][j] != null) {
+					gridTwo.add(tableDelutan[i][j], i, j);
+				} else if (j == 0 && tableDelutan[i][j] == null) {
+					AppButton button = new AppButton(Integer.MAX_VALUE);
+					button.setText("Nincs elõadás");
+					button.setPrefSize(100, 75);
+					gridTwo.add(button, i, j);
+				}
+			}
+		}
+		tabPane.prefWidth(buttonTable.length * 100);
+		delelottButton.setPrefWidth(buttonTable.length * 100);
+		delutanButton.setPrefWidth(buttonTable.length * 100);
+	}
 
 	private void insertDelutan(int index, AppButton buttonTable) {
 		boolean insert = true;
@@ -385,68 +389,81 @@ public class TableControl {
 		}
 	}
 
-//	private void setGrids(Presentation[][] table) throws ParseException {
-//		LocalTime del = null;
-//		del = LocalTime.parse("12:00", formatterDateTime);
-//		AppButton[][] buttonTable = new AppButton[table.length][table[0].length];
-//		for (int i = 0; i < table.length; i++) {
-//			for (int j = 0; j < table[i].length; j++) {
-//				if (table[i][j] != null) {
-//					buttonTable[i][j] = new AppButton(i);
-//					buttonTable[i][j].setPresentationId(table[i][j].getId());
-//					buttonTable[i][j].setText(
-//							table[i][j].getTopic() + "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
-//					buttonTable[i][j].setPrefSize(100, 75);
-//					if (table[i][j].isPoirity()) {
-//						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
-//					}
-//					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
-//					tableMod[i][j] = table[i][j];
-//				}
-//			}
-//		}
-//		for (int i = 0; i < buttonTable.length; i++) {
-//			for (int j = 0; j < buttonTable[i].length; j++) {
-//				if (buttonTable[i][j] != null) {
-//					final AppButton myButton = buttonTable[i][j];
-//					myButton.setOnAction(new EventHandler<ActionEvent>() {
-//						public void handle(ActionEvent event) {
-//							setPresentation(myButton.getPresentationId(), table);
-//						}
-//					});
-//				}
-//			}
-//		}
-//		for (int i = 0; i < table.length; i++) {
-//			LocalTime localtime = LocalTime.parse("08:00", formatterDateTime);
-//			for (int j = 0; j < table[i].length; j++) {
-//				if (table[i][j] != null) {
-//					String tmpInter = table[i][j].getInter();
-//					String[] interArray = tmpInter.split("\\.");
-//					localtime.plusMinutes(Integer.parseInt(interArray[0]));
-//					if (localtime.isBefore(del)) {
-//						insertDelelott(i, buttonTable[i][j]);
-//					} else {
-//						insertDelutan(i, buttonTable[i][j]);
-//					}
-//				}
-//			}
-//		}
-//		for (int i = 0; i < tableDelelott.length; i++) {
-//			for (int j = 0; j < tableDelelott[i].length; j++) {
-//				if (tableDelelott[i][j] != null) {
-//					gridOne.add(tableDelelott[i][j], i, j);
-//				}
-//			}
-//		}
-//		for (int i = 0; i < tableDelutan.length; i++) {
-//			for (int j = 0; j < tableDelutan[i].length; j++) {
-//				if (tableDelutan[i][j] != null) {
-//					gridTwo.add(tableDelutan[i][j], i, j);
-//				}
-//			}
-//		}
-//	}
+	private void setGrids(Presentation[][] table) throws ParseException {
+		LocalTime del = null;
+		del = LocalTime.parse("12:00", formatterDateTime);
+		AppButton[][] buttonTable = new AppButton[table.length][table[0].length];
+		for (int i = 0; i < table.length; i++) {
+			for (int j = 0; j < table[i].length; j++) {
+				if (table[i][j] != null) {
+					buttonTable[i][j] = new AppButton(i);
+					buttonTable[i][j].setPresentationId(table[i][j].getId());
+					buttonTable[i][j].setText(
+							table[i][j].getTopic() + "\n" + table[i][j].getFrom() + " - " + table[i][j].getTo());
+					buttonTable[i][j].setPrefSize(100, 75);
+					if (table[i][j].isPoirity()) {
+						buttonTable[i][j].setStyle("-fx-background-color: #96012e");
+					}
+					buttonTable[i][j].setTextAlignment(TextAlignment.CENTER);
+					tableMod[i][j] = table[i][j];
+				}
+			}
+		}
+		for (int i = 0; i < buttonTable.length; i++) {
+			for (int j = 0; j < buttonTable[i].length; j++) {
+				if (buttonTable[i][j] != null) {
+					final AppButton myButton = buttonTable[i][j];
+					myButton.setOnAction(new EventHandler<ActionEvent>() {
+						public void handle(ActionEvent event) {
+							setPresentation(myButton.getPresentationId(), table);
+						}
+					});
+				}
+			}
+		}
+		for (int i = 0; i < table.length; i++) {
+			LocalTime localtime = LocalTime.parse("08:00", formatterDateTime);
+			for (int j = 0; j < table[i].length; j++) {
+				if (table[i][j] != null) {
+					String tmpInter = table[i][j].getInter();
+					String[] interArray = tmpInter.split("\\.");
+					localtime.plusMinutes(Integer.parseInt(interArray[0]));
+					if (localtime.isBefore(del)) {
+						insertDelelott(i, buttonTable[i][j]);
+					} else {
+						insertDelutan(i, buttonTable[i][j]);
+					}
+				}
+			}
+		}
+		for (int i = 0; i < tableDelelott.length; i++) {
+			for (int j = 0; j < tableDelelott[i].length; j++) {
+				if (tableDelelott[i][j] != null) {
+					gridOneDele.add(tableDelelott[i][j], i, j);
+				}
+			}
+		}
+		for (int i = 0; i < tableDelutan.length; i++) {
+			for (int j = 0; j < tableDelutan[i].length; j++) {
+				if (tableDelutan[i][j] != null) {
+					gridOneDelu.add(tableDelutan[i][j], i, j);
+				}
+			}
+		}
+		GridPane TabgridPane = new GridPane();
+		delelottButton = new Button("Délelõtt");
+		TabgridPane.add(delelottButton, 0, 0);
+		TabgridPane.add(gridOneDele, 0, 1);
+		delutanButton = new Button("Délután");
+//		delelottButton.setPrefWidth(buttonTableList.get(0).length * 100);
+//		delutanButton.setPrefWidth(buttonTableList.get(0).length * 100);
+		TabgridPane.add(delutanButton, 0, 2);
+		TabgridPane.add(gridOneDelu, 0, 3);
+		Tab tab1 = new Tab();
+		tab1.setText("Elsõ nap");
+		tab1.setContent(TabgridPane);
+		tabPane.getTabs().add(tab1);
+	}
 
 	public void setFirstGrid(LinkedList<Presentation[][]> tableList, LinkedList<PresentationOperator> operators,
 			Section section) {

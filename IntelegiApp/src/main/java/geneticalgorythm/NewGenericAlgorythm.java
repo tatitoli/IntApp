@@ -6,18 +6,16 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
-import app.model.DateOperator;
 import app.model.Section;
 import app.sort.PresentationOperator;
 import app.sort.PresentationProblem;
-import app.sort.PresentationState;
 
 public class NewGenericAlgorythm {
 	DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
@@ -26,6 +24,7 @@ public class NewGenericAlgorythm {
 	LinkedList<NewParent> childrenList;
 	PresentationProblem p;
 	boolean first = true;
+	int target = 0;
 	int min;
 	PresentationProblem seged;
 	Map<String, LinkedList<Integer>> actualMap = new HashMap<>();
@@ -35,59 +34,54 @@ public class NewGenericAlgorythm {
 	}
 
 	public boolean run() {
+		target++;
 		childrenList = new LinkedList<>();
-		LinkedList<Integer> selectedList = new LinkedList<>();
-		Map<Integer, String> p1Map = new HashMap<>();
-		Map<Integer, String> p2Map = new HashMap<>();
-		Parent p1 = null;
-		Parent p2 = null;
-		LinkedList<Integer> p1List = new LinkedList<>();
-		LinkedList<Integer> p2List = new LinkedList<>();
-		LinkedList<Integer> tmpList = null;
-		Map<String, LinkedList<Integer>> tmpMap = new HashMap<>();
-		Map<String, LinkedList<Integer>> childrenMap = new HashMap<>();
 		initalizeStartParents(p.getOperators(), p.getSection());
 		getCostMap(parentList, p.getOperators(), p.getSection());
 		calcFitness(parentList);
-		Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
-		// childrenList.add(parentList.get(0));
-		// childrenList.add(parentList.get(1));
-		// for (int i = 0; i < parentList.size(); i++) {
-		// originalParentList.add(parentList.get(i));
-		// }
-		// boolean change = false;
-		// int tryred = 0;
-		// boolean checkFalse = false;
+//		Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
 		while (true) {
+			target++;
 			Random randomGenerator = new Random();
 			int randomInt = randomGenerator.nextInt(100);
-			int sum = 0;
+			Random r = new Random();
+			double randomValue = 0 + (100 - 0) * r.nextDouble();
+			Double sum = 0.0;
 			Map<String, LinkedList<Integer>> child1 = new HashMap<>();
 			Map<String, LinkedList<Integer>> child2 = new HashMap<>();
 			for (NewParent parent : parentList) {
 				sum += parent.getFitness();
-				if (sum > randomInt) {
+				if (sum > randomValue) {
 					child1 = parent.getStateMap();
 					break;
 				}
 			}
-			randomInt = randomGenerator.nextInt(100);
-			sum = 0;
+			randomValue = 0 + (100 - 0) * r.nextDouble();
+			sum = 0.0;
 			for (NewParent parent : parentList) {
 				sum += parent.getFitness();
-				if (sum > randomInt) {
+				if (sum > randomValue) {
 					child2 = parent.getStateMap();
 					break;
 				}
 			}
 			keresztezes(child1, child2, p.operators());
-			if(childrenList.size()>=10){
-				getCostMap(childrenList, p.getOperators(), p.getSection());
-				parentList.addAll(childrenList);
-//				Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
+			if (childrenList.size() >= 10) {
+				target++;
+				for (NewParent newParent : childrenList) {
+					parentList.add(new NewParent(newParent.getStateMap(), null));
+				}
+				getCostMap(parentList, p.getOperators(), p.getSection());
+				Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
+				for(int i=0;i<10;i++){
+					parentList.removeLast();
+				}
+				calcFitness(parentList);
 				childrenList = new LinkedList<>();
 			}
-			
+			if(target>=10000){
+				return true;
+			}
 		}
 	}
 
@@ -97,7 +91,7 @@ public class NewGenericAlgorythm {
 		Map<String, LinkedList<Integer>> temp1Map = new HashMap<>();
 		Map<String, LinkedList<Integer>> temp2Map = new HashMap<>();
 		for (PresentationOperator presentationOperator : operators) {
-			if (i < operators.size() / 2) {
+			if (i <= operators.size() / 2) {
 				for (Map.Entry<String, LinkedList<Integer>> entry : child2.entrySet()) {
 					LinkedList<Integer> lista = entry.getValue();
 					if (lista != null && lista.contains(presentationOperator.getId())) {
@@ -131,7 +125,7 @@ public class NewGenericAlgorythm {
 					}
 				}
 			}
-			if (i >= operators.size() / 2) {
+			if (i > operators.size() / 2) {
 				for (Map.Entry<String, LinkedList<Integer>> entry : child2.entrySet()) {
 					LinkedList<Integer> lista = entry.getValue();
 					if (lista != null && lista.contains(presentationOperator.getId())) {
@@ -167,17 +161,20 @@ public class NewGenericAlgorythm {
 			}
 			i++;
 		}
-//		Random rand = new Random();
-//		int randomNumber = rand.nextInt(100) + 1;
-//		if (randomNumber <= 10) {
-//			temp1Map = mutacio(temp1Map);
-//		}
-//		randomNumber = rand.nextInt(100) + 1;
-//		if (randomNumber <= 10) {
-//			temp2Map = mutacio(temp2Map);
-//		}
-		childrenList.add(new NewParent(temp1Map, null));
-		childrenList.add(new NewParent(temp2Map, null));
+//		 Random rand = new Random();
+//		 int randomNumber = rand.nextInt(100) + 1;
+//		 if (randomNumber <= 10) {
+//			 temp1Map = mutacio(temp1Map);
+//		 }
+//		 randomNumber = rand.nextInt(100) + 1;
+//		 if (randomNumber <= 10) {
+//			 temp2Map = mutacio(temp2Map);
+//		 }
+		if (checkState(temp1Map, p.getOperators())) {
+			childrenList.add(new NewParent(new HashMap<>(temp1Map), null));
+		}if (checkState(temp2Map, p.getOperators())) {
+			childrenList.add(new NewParent(new HashMap<>(temp2Map), null));
+		}
 	}
 
 	private void calcFitness(LinkedList<NewParent> parentList) {
@@ -188,7 +185,7 @@ public class NewGenericAlgorythm {
 		}
 		for (int i = 0; i < parentList.size(); i++) {
 			actualCost = 1.0 / Double.parseDouble(parentList.get(i).getCost().toString());
-			parentList.get(i).setFitness((int) ((actualCost / sumFitness) * 100));
+			parentList.get(i).setFitness(((actualCost / sumFitness) * 100.0));
 		}
 	}
 
@@ -269,46 +266,50 @@ public class NewGenericAlgorythm {
 					}
 				}
 			}
-			parentList.add(new NewParent(tmpMap, null));
+			if (checkState(tmpMap, operators)) {
+				parentList.add(new NewParent(tmpMap, null));
+			}
 		}
 	}
 
-	private boolean checkState(Map<String, LinkedList<Integer>> stateMap, LinkedList<PresentationOperator> operators,
-			Section section, LinkedList<String> dayList) {
-		boolean hasNullSection = false;
+	private boolean checkState(Map<String, LinkedList<Integer>> tmpMap, LinkedList<PresentationOperator> operators) {
 		LocalTime localtime = null;
-		for (int d = 0; d < dayList.size(); d++) {
-			for (Map.Entry<String, LinkedList<Integer>> entry : stateMap.entrySet()) {
-				if (entry.getKey().contains(dayList.get(d))) {
-					LinkedList<Integer> idList = entry.getValue();
-					if (idList.isEmpty()) {
-						hasNullSection = true;
-					}
-					localtime = LocalTime.parse(section.getFrom(), formatter);
-					PresentationOperator actualPresentation = null;
-					for (int i = 0; i < idList.size(); i++) {
-						for (PresentationOperator operator : operators) {
-							if (idList.get(i).equals(operator.getId())) {
-								actualPresentation = operator;
-								break;
+		LocalTime localtimeEnd = null;
+		LocalTime localtimeDel = null;
+		LocalTime localtime13 = null;
+		for (Map.Entry<String, LinkedList<Integer>> entry : tmpMap.entrySet()) {
+			LinkedList<Integer> tmpList = entry.getValue();
+			if (tmpList != null) {
+				localtime = LocalTime.parse(p.getSection().getFrom(), formatter);
+				localtimeEnd = LocalTime.parse(p.getSection().getTo(), formatter);
+				localtimeDel = LocalTime.parse("12:00", formatter);
+				localtime13 = LocalTime.parse("13:00", formatter);
+				for (Integer integer : tmpList) {
+					for (PresentationOperator presentationOperator : operators) {
+						if (integer == presentationOperator.getId()) {
+							if (entry.getKey().contains("DE")) {
+								if("DU".equals(presentationOperator.getFrom())){
+									return false;
+								}
+								String tmpInter = presentationOperator.getInter();
+								String[] interArray = tmpInter.split("\\.");
+								localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
+								if(!localtime.isBefore(localtimeDel)){
+									return false;
+								}
+							} else if (entry.getKey().contains("DU")) {
+								if("DE".equals(presentationOperator.getFrom())){
+									return false;
+								}
+								String tmpInter = presentationOperator.getInter();
+								String[] interArray = tmpInter.split("\\.");
+								localtime13 = localtime13.plusMinutes(Integer.parseInt(interArray[0]));
+								if(!localtime13.isBefore(localtimeEnd)){
+									return false;
+								}
 							}
 						}
-						String[] from = actualPresentation.getFrom().split(" ");
-						String[] to = actualPresentation.getTo().split(" ");
-						LocalTime fromLT = LocalTime.parse(from[3], formatter);
-						// fromLT = fromLT.plusNanos(1);
-						LocalTime toLT = LocalTime.parse(to[3], formatter);
-						if (localtime.isBefore(fromLT) || localtime.isBefore(toLT)) {
-							String tmpInter = actualPresentation.getInter();
-							String[] interArray = tmpInter.split("\\.");
-							localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
-						} else {
-							return false;
-						}
 					}
-				}
-				if (hasNullSection) {
-					return false;
 				}
 			}
 		}
@@ -317,36 +318,51 @@ public class NewGenericAlgorythm {
 
 	private Map<String, LinkedList<Integer>> mutacio(Map<String, LinkedList<Integer>> childrenMap) {
 		Map<String, LinkedList<Integer>> actualMap = new HashMap<>();
-		String maxSection = "";
-		int maxSectionNumber = Integer.MIN_VALUE;
-		int minSectionNumber = Integer.MAX_VALUE;
-		String minSection = "";
-		// Map<String, Integer> sectionCostMap = new HashMap<String, Integer>();
+		Random rand = new Random();
+		int from = p.getOperators().size();
+		int randomNumber = rand.nextInt(from);
+		PresentationOperator op1 = p.getOperators().get(randomNumber);
+		randomNumber = rand.nextInt(from);
+		PresentationOperator op2 = p.getOperators().get(randomNumber);
 		for (Map.Entry<String, LinkedList<Integer>> entry : childrenMap.entrySet()) {
-			// sectionCostMap.put(entry.getKey(), entry.getValue().size());
-			if (entry.getValue().size() < minSectionNumber) {
-				minSection = entry.getKey();
-				minSectionNumber = entry.getValue().size();
-			}
-			if (entry.getValue().size() > maxSectionNumber) {
-				maxSection = entry.getKey();
-				maxSectionNumber = entry.getValue().size();
+			LinkedList<Integer> tmpList = entry.getValue();
+			if(tmpList!= null){
+				if(tmpList.contains(op1.getId())){
+					for (Integer integer : tmpList) {
+						if(integer.equals(op1.getId())){
+							tmpList.remove(integer);
+						}
+					}
+					tmpList.add(op2.getId());
+					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
+				}if(tmpList.contains(op2.getId())){
+					for (Integer integer : tmpList) {
+						if(integer.equals(op2.getId())){
+							tmpList.remove(integer);
+						}
+					}
+					tmpList.add(op1.getId());
+					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
+				}
 			}
 		}
-		LinkedList<Integer> minList = new LinkedList<>();
-		LinkedList<Integer> maxList = new LinkedList<>();
-		minList = childrenMap.get(minSection);
-		maxList = childrenMap.get(maxSection);
-		for (int i = maxList.size() / 2; i < maxList.size(); i++) {
-			minList.add(maxList.remove(i));
-		}
-		actualMap.put(minSection, minList);
-		actualMap.put(maxSection, maxList);
 		for (Map.Entry<String, LinkedList<Integer>> entry : childrenMap.entrySet()) {
 			if (!actualMap.containsKey(entry.getKey())) {
 				actualMap.put(new String(entry.getKey()), new LinkedList<>(entry.getValue()));
 			}
 		}
 		return actualMap;
+	}
+
+	public Map<String, LinkedList<Integer>> GetMapFullTabla() {
+		return parentList.getFirst().getStateMap();
+	}
+	
+	class CostComparator implements Comparator<NewParent> {
+	    @Override
+	    public int compare(NewParent a, NewParent b) {
+	        return a.getCost() < b.getCost() ? -1 : a.getCost() == b.getCost() ? 0 : 1;
+	    }
+
 	}
 }

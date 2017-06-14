@@ -6,7 +6,7 @@ import java.util.Map;
 public class NewParent {
 	Map<String, LinkedList<Integer>> stateMap;
 	Integer cost;
-	Integer fitness;
+	Double fitness;
 
 	public NewParent(Map<String, LinkedList<Integer>> stateMap, Integer cost) {
 		super();
@@ -30,11 +30,48 @@ public class NewParent {
 		this.cost = cost;
 	}
 
-	public Integer getFitness() {
+	public Double getFitness() {
 		return fitness;
 	}
 
-	public void setFitness(Integer fitness) {
+	public void setFitness(Double fitness) {
 		this.fitness = fitness;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cost == null) ? 0 : cost.hashCode());
+		result = prime * result + ((fitness == null) ? 0 : fitness.hashCode());
+		result = prime * result + ((stateMap == null) ? 0 : stateMap.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NewParent other = (NewParent) obj;
+		if (cost == null) {
+			if (other.cost != null)
+				return false;
+		} else if (!cost.equals(other.cost))
+			return false;
+		if (fitness == null) {
+			if (other.fitness != null)
+				return false;
+		} else if (!fitness.equals(other.fitness))
+			return false;
+		if (stateMap == null) {
+			if (other.stateMap != null)
+				return false;
+		} else if (!stateMap.equals(other.stateMap))
+			return false;
+		return true;
 	}
 }
