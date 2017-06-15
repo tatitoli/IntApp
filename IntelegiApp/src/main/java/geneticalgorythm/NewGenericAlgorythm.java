@@ -161,15 +161,15 @@ public class NewGenericAlgorythm {
 			}
 			i++;
 		}
-//		 Random rand = new Random();
-//		 int randomNumber = rand.nextInt(100) + 1;
-//		 if (randomNumber <= 10) {
-//			 temp1Map = mutacio(temp1Map);
-//		 }
-//		 randomNumber = rand.nextInt(100) + 1;
-//		 if (randomNumber <= 10) {
-//			 temp2Map = mutacio(temp2Map);
-//		 }
+		 Random rand = new Random();
+		 int randomNumber = rand.nextInt(100) + 1;
+		 if (randomNumber <= 10) {
+			 temp1Map = mutacio(temp1Map);
+		 }
+		 randomNumber = rand.nextInt(100) + 1;
+		 if (randomNumber <= 10) {
+			 temp2Map = mutacio(temp2Map);
+		 }
 		if (checkState(temp1Map, p.getOperators())) {
 			childrenList.add(new NewParent(new HashMap<>(temp1Map), null));
 		}if (checkState(temp2Map, p.getOperators())) {
@@ -327,20 +327,23 @@ public class NewGenericAlgorythm {
 		for (Map.Entry<String, LinkedList<Integer>> entry : childrenMap.entrySet()) {
 			LinkedList<Integer> tmpList = entry.getValue();
 			if(tmpList!= null){
+				int index = 0;
 				if(tmpList.contains(op1.getId())){
-					for (Integer integer : tmpList) {
-						if(integer.equals(op1.getId())){
-							tmpList.remove(integer);
+					for(int i = 0;i<tmpList.size();i++){
+						if(tmpList.get(i).equals(op1.getId())){
+							index = i;
 						}
 					}
+					tmpList.remove(index);
 					tmpList.add(op2.getId());
 					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
 				}if(tmpList.contains(op2.getId())){
-					for (Integer integer : tmpList) {
-						if(integer.equals(op2.getId())){
-							tmpList.remove(integer);
+					for(int i = 0;i<tmpList.size();i++){
+						if(tmpList.get(i).equals(op2.getId())){
+							index = i;
 						}
 					}
+					tmpList.remove(index);
 					tmpList.add(op1.getId());
 					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
 				}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 
 import app.model.Section;
+import app.sort.Presentation;
 import app.sort.PresentationOperator;
 
 public interface PresentationsDao {
@@ -12,7 +13,7 @@ public interface PresentationsDao {
 	
 	LinkedList<PresentationOperator> getPresentations();
 	
-	void writePresentations();
+	void writePresentations(Presentation[][] table, Section section);
 
 	LinkedList<PresentationOperator> getPresentations(File file);
 	

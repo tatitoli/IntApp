@@ -3,6 +3,7 @@ package app.daoimp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,9 +13,12 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import app.dao.PresentationsDao;
 import app.model.Section;
+import app.sort.Presentation;
 import app.sort.PresentationOperator;
 
 public class PresentationsDaoImp implements PresentationsDao {
@@ -24,11 +28,6 @@ public class PresentationsDaoImp implements PresentationsDao {
 		return null;
 	}
 
-	@Override
-	public void writePresentations() {
-
-	}
-	
 	@Override
 	public LinkedList<PresentationOperator> getPresentations() {
 		LinkedList<PresentationOperator> operators = new LinkedList<>();
@@ -41,7 +40,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
 				if (row.getRowNum() > 0) {
-					String presentationTitle  = null;
+					String presentationTitle = null;
 					String actor = null;
 					String topic = null;
 					String from = null;
@@ -72,10 +71,12 @@ public class PresentationsDaoImp implements PresentationsDao {
 							break;
 						}
 					}
-					if("Fontos".equals(fontos)){				
-						operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, from, to, true,15));
-					}else{
-						operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
+					if ("Fontos".equals(fontos)) {
+						operators.addFirst(
+								new PresentationOperator(i, presentationTitle, actor, topic, from, to, true, 15));
+					} else {
+						operators
+								.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, false, 15));
 					}
 					i++;
 				}
@@ -102,7 +103,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 				Cell cell = null;
 				Row row = rowIterator.next();
 				if (row.getRowNum() > 0) {
-					String presentationTitle  = null;
+					String presentationTitle = null;
 					String actor = null;
 					String topic = null;
 					String from = null;
@@ -132,10 +133,12 @@ public class PresentationsDaoImp implements PresentationsDao {
 							break;
 						}
 					}
-					if("Fontos".equals(fontos)){				
-						operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, from, to, true,15));
-					}else{
-						operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from, to, false,15));
+					if ("Fontos".equals(fontos)) {
+						operators.addFirst(
+								new PresentationOperator(i, presentationTitle, actor, topic, from, to, true, 15));
+					} else {
+						operators
+								.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, false, 15));
 					}
 					i++;
 				}
@@ -152,7 +155,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 	@Override
 	public Section getSection(File input) {
 		LinkedList<String> sections = new LinkedList<>();
-		LinkedList<String> dates =  new LinkedList<>();
+		LinkedList<String> dates = new LinkedList<>();
 		Section section = null;
 		try {
 			FileInputStream file = new FileInputStream(input);
@@ -180,17 +183,16 @@ public class PresentationsDaoImp implements PresentationsDao {
 							break;
 						}
 					}
-				}else if(row.getRowNum() > 1){
+				} else if (row.getRowNum() > 1) {
 					Iterator<Cell> cellIterator = row.cellIterator();
 					while (cellIterator.hasNext()) {
 						Cell cell = cellIterator.next();
-						if(cell.getStringCellValue() != null && !"".equals(cell.getStringCellValue())){
+						if (cell.getStringCellValue() != null && !"".equals(cell.getStringCellValue())) {
 							sections.add(cell.getStringCellValue());
 						}
 					}
 				}
-				
-				
+
 			}
 			file.close();
 			section = new Section(sectionNumber, from, to, sections);
@@ -215,7 +217,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 				Cell cell = null;
 				Row row = rowIterator.next();
 				if (row.getRowNum() > 0) {
-					String presentationTitle  = null;
+					String presentationTitle = null;
 					String actor = null;
 					String topic = null;
 					String from = null;
@@ -245,26 +247,31 @@ public class PresentationsDaoImp implements PresentationsDao {
 							to = new DataFormatter().formatCellValue(cell);
 							break;
 						}
-						if(cell.getColumnIndex() == 5){
-							if("Fontos".equals(fontos)){				
-								operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, true,15));
-							}else{
-								operators.add(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, false,15));
+						if (cell.getColumnIndex() == 5) {
+							if ("Fontos".equals(fontos)) {
+								operators.addFirst(new PresentationOperator(i, presentationTitle, actor, topic, inter,
+										from, to, true, 15));
+							} else {
+								operators.add(new PresentationOperator(i, presentationTitle, actor, topic, inter, from,
+										to, false, 15));
 							}
-							from =null;
-							to=null;
+							from = null;
+							to = null;
 						}
-						if(cell.getColumnIndex() > 5 && cell.getColumnIndex()%2 == 1){
+						if (cell.getColumnIndex() > 5 && cell.getColumnIndex() % 2 == 1) {
 							to = new DataFormatter().formatCellValue(cell);
 						}
-						if(cell.getColumnIndex() > 5 && cell.getColumnIndex()%2 == 0){
+						if (cell.getColumnIndex() > 5 && cell.getColumnIndex() % 2 == 0) {
 							from = new DataFormatter().formatCellValue(cell);
 						}
-						if(cell.getColumnIndex() > 5 && from != null && to !=null && !"".equals(from) && !"".equals(to)){
-							if("Fontos".equals(fontos)){				
-								operators.addFirst(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, true,15));
-							}else{
-								operators.add(new PresentationOperator(i,presentationTitle, actor, topic, inter, from, to, false,15));
+						if (cell.getColumnIndex() > 5 && from != null && to != null && !"".equals(from)
+								&& !"".equals(to)) {
+							if ("Fontos".equals(fontos)) {
+								operators.addFirst(new PresentationOperator(i, presentationTitle, actor, topic, inter,
+										from, to, true, 15));
+							} else {
+								operators.add(new PresentationOperator(i, presentationTitle, actor, topic, inter, from,
+										to, false, 15));
 							}
 						}
 					}
@@ -292,7 +299,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
 				if (row.getRowNum() > 0) {
-					String presentationTitle  = null;
+					String presentationTitle = null;
 					String actor = null;
 					String topic = null;
 					String from = null;
@@ -316,10 +323,10 @@ public class PresentationsDaoImp implements PresentationsDao {
 						case 4:
 							from = new DataFormatter().formatCellValue(cell);
 							break;
-					
+
 						}
 					}
-					operators.add(new PresentationOperator(i,presentationTitle, actor, topic, from,intervallum));
+					operators.add(new PresentationOperator(i, presentationTitle, actor, topic, from, intervallum));
 					i++;
 				}
 			}
@@ -330,5 +337,46 @@ public class PresentationsDaoImp implements PresentationsDao {
 			e.printStackTrace();
 		}
 		return operators;
+	}
+
+	@Override
+	public void writePresentations(Presentation[][] table, Section section) {
+		final String FILE_NAME = "EloadasExcel.xlsx";
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Elõadás");
+		Object[][] datatypes = new Object[table.length][table[0].length];
+		for (int i = 0; i < table.length; i++) {
+			for (int j = 0; j < table[i].length; j++) {
+				if(table[i][j] != null){
+					datatypes[i][j] = table[i][j].getPresentationTitle();
+				}
+			}
+		}
+		int rowNum = 0;
+		for (Object[] datatype : datatypes) {
+            Row row = sheet.createRow(rowNum++);
+            int colNum = 0;
+            Cell cell = row.createCell(colNum++);
+            cell.setCellValue((String) section.getSections().get(rowNum-1));
+            for (Object field : datatype) {
+                cell = row.createCell(colNum++);
+                if (field instanceof String) {
+                    cell.setCellValue((String) field);
+                } else if (field instanceof Integer) {
+                    cell.setCellValue((Integer) field);
+                }
+            }
+        }
+
+        try {
+            FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 }

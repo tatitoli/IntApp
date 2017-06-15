@@ -8,6 +8,7 @@ import java.time.format.FormatStyle;
 import java.util.LinkedList;
 import java.util.Map;
 
+import app.daoimp.PresentationsDaoImp;
 import app.model.AppButton;
 import app.model.Section;
 import app.sort.Presentation;
@@ -38,6 +39,7 @@ public class TableControl {
 	Section sectionTab;
 	int[][] intTable;
 	LinkedList<Presentation[][]> tableList;
+	PresentationsDaoImp daoImp = new PresentationsDaoImp(); 
 	
 	@FXML
 	Button changeButton;
@@ -124,6 +126,7 @@ public class TableControl {
 	}
 
 	public void setFirstGrid(Presentation[][] table, LinkedList<PresentationOperator> operators, Section section) {
+		tableMod = table;
 		operatorsTab = operators;
 		sectionTab = section;
 		tableMod = new Presentation[table.length][table[0].length];
@@ -254,6 +257,11 @@ public class TableControl {
 		}
 		return newOperatorList;
 	}
+	
+	@FXML
+	public void excelExportAction(ActionEvent event) {
+		daoImp.writePresentations(tableMod, sectionTab);
+	}
 
 	@FXML
 	public void reGenerateAction(ActionEvent event) {
@@ -379,8 +387,6 @@ public class TableControl {
 						topic.setText(table[i][j].getTopic());
 						presentatior.setText(table[i][j].getActor());
 						time.setText(table[i][j].getFrom() + " - " + table[i][j].getTo());
-						weight.setText(table[i][j].getWeight() + "");
-						piority.setSelected(table[i][j].isPoirity());
 						presentationId = id;
 						break;
 					}
