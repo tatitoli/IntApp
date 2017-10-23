@@ -6,7 +6,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +19,7 @@ import app.sort.PresentationProblem;
 public class NewGenericAlgorythm {
 	DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 	LinkedList<NewParent> parentList;
+	LinkedList<NewParent> newParentList;
 	LinkedList<Parent> originalParentList = new LinkedList<>();
 	LinkedList<NewParent> childrenList;
 	PresentationProblem p;
@@ -39,16 +39,15 @@ public class NewGenericAlgorythm {
 		initalizeStartParents(p.getOperators(), p.getSection());
 		getCostMap(parentList, p.getOperators(), p.getSection());
 		calcFitness(parentList);
-//		Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
+		Collections.sort(parentList, (a, b) -> a.getCost().compareTo(b.getCost()));
 		while (true) {
 			target++;
-			Random randomGenerator = new Random();
-			int randomInt = randomGenerator.nextInt(100);
 			Random r = new Random();
 			double randomValue = 0 + (100 - 0) * r.nextDouble();
 			Double sum = 0.0;
 			Map<String, LinkedList<Integer>> child1 = new HashMap<>();
 			Map<String, LinkedList<Integer>> child2 = new HashMap<>();
+			Collections.sort(parentList, (a, b) -> b.getFitness().compareTo(a.getFitness()));
 			for (NewParent parent : parentList) {
 				sum += parent.getFitness();
 				if (sum > randomValue) {
@@ -66,7 +65,7 @@ public class NewGenericAlgorythm {
 				}
 			}
 			keresztezes(child1, child2, p.operators());
-			if (childrenList.size() >= 10) {
+			if (childrenList.size() == 10) {
 				target++;
 				for (NewParent newParent : childrenList) {
 					parentList.add(new NewParent(newParent.getStateMap(), null));
@@ -79,7 +78,7 @@ public class NewGenericAlgorythm {
 				calcFitness(parentList);
 				childrenList = new LinkedList<>();
 			}
-			if(target>=10000){
+			if(target>=15000){
 				return true;
 			}
 		}
@@ -90,8 +89,10 @@ public class NewGenericAlgorythm {
 		int i = 0;
 		Map<String, LinkedList<Integer>> temp1Map = new HashMap<>();
 		Map<String, LinkedList<Integer>> temp2Map = new HashMap<>();
+		Random randomGenerator = new Random();
+		int randomInt = randomGenerator.nextInt(operators.size())+1;
 		for (PresentationOperator presentationOperator : operators) {
-			if (i <= operators.size() / 2) {
+			if (i <= operators.size() / randomInt) {
 				for (Map.Entry<String, LinkedList<Integer>> entry : child2.entrySet()) {
 					LinkedList<Integer> lista = entry.getValue();
 					if (lista != null && lista.contains(presentationOperator.getId())) {
@@ -125,7 +126,7 @@ public class NewGenericAlgorythm {
 					}
 				}
 			}
-			if (i > operators.size() / 2) {
+			if (i > operators.size() / randomInt) {
 				for (Map.Entry<String, LinkedList<Integer>> entry : child2.entrySet()) {
 					LinkedList<Integer> lista = entry.getValue();
 					if (lista != null && lista.contains(presentationOperator.getId())) {
@@ -171,9 +172,9 @@ public class NewGenericAlgorythm {
 			 temp2Map = mutacio(temp2Map);
 		 }
 		if (checkState(temp1Map, p.getOperators())) {
-			childrenList.add(new NewParent(new HashMap<>(temp1Map), null));
+			childrenList.add(new NewParent(new HashMap<>(temp1Map), 0.00));
 		}if (checkState(temp2Map, p.getOperators())) {
-			childrenList.add(new NewParent(new HashMap<>(temp2Map), null));
+			childrenList.add(new NewParent(new HashMap<>(temp2Map), 0.00));
 		}
 	}
 
@@ -181,10 +182,10 @@ public class NewGenericAlgorythm {
 		Double actualCost = 0.0;
 		Double sumFitness = 0.0;
 		for (int i = 0; i < parentList.size(); i++) {
-			sumFitness += 1.0 / Double.parseDouble(parentList.get(i).getCost().toString());
+			sumFitness += 1.00 / Double.parseDouble(parentList.get(i).getCost().toString());
 		}
 		for (int i = 0; i < parentList.size(); i++) {
-			actualCost = 1.0 / Double.parseDouble(parentList.get(i).getCost().toString());
+			actualCost = 1.00 / Double.parseDouble(parentList.get(i).getCost().toString());
 			parentList.get(i).setFitness(((actualCost / sumFitness) * 100.0));
 		}
 	}
@@ -196,14 +197,14 @@ public class NewGenericAlgorythm {
 			typeCostMap.put(operator.getTopic(), -1);
 		}
 		typeList = new ArrayList<>();
-		int sumDb = 0;
+		double sumDb = 0.0;
 		int db = 0;
 		int cost = 0;
 		for (int i = 0; i < parent.size(); i++) {
 			cost = 0;
 			Map<String, LinkedList<Integer>> temp = parent.get(i).getStateMap();
 			PresentationOperator presentation = null;
-			sumDb = 0;
+			sumDb = 0.0;
 			for (Map.Entry<String, LinkedList<Integer>> entry : temp.entrySet()) {
 				typeList = new ArrayList<>();
 				LinkedList<Integer> lista = entry.getValue();
@@ -267,7 +268,7 @@ public class NewGenericAlgorythm {
 				}
 			}
 			if (checkState(tmpMap, operators)) {
-				parentList.add(new NewParent(tmpMap, null));
+				parentList.add(new NewParent(tmpMap, 0.00));
 			}
 		}
 	}
@@ -294,7 +295,7 @@ public class NewGenericAlgorythm {
 								String tmpInter = presentationOperator.getInter();
 								String[] interArray = tmpInter.split("\\.");
 								localtime = localtime.plusMinutes(Integer.parseInt(interArray[0]));
-								if(!localtime.isBefore(localtimeDel)){
+								if(localtime.isAfter(localtimeDel)){
 									return false;
 								}
 							} else if (entry.getKey().contains("DU")) {
@@ -304,7 +305,7 @@ public class NewGenericAlgorythm {
 								String tmpInter = presentationOperator.getInter();
 								String[] interArray = tmpInter.split("\\.");
 								localtime13 = localtime13.plusMinutes(Integer.parseInt(interArray[0]));
-								if(!localtime13.isBefore(localtimeEnd)){
+								if(localtime13.isAfter(localtimeEnd)){
 									return false;
 								}
 							}
@@ -326,46 +327,24 @@ public class NewGenericAlgorythm {
 		PresentationOperator op2 = p.getOperators().get(randomNumber);
 		for (Map.Entry<String, LinkedList<Integer>> entry : childrenMap.entrySet()) {
 			LinkedList<Integer> tmpList = entry.getValue();
-			if(tmpList!= null){
-				int index = 0;
-				if(tmpList.contains(op1.getId())){
-					for(int i = 0;i<tmpList.size();i++){
-						if(tmpList.get(i).equals(op1.getId())){
-							index = i;
-						}
+			LinkedList<Integer> newList = new LinkedList<>();
+			if(tmpList != null){
+				for (Integer id : tmpList) {
+					if(id == op1.getId()){
+						newList.add(op2.getId());
+					}else if(id == op2.getId()){
+						newList.add(op1.getId());
+					}else{
+						newList.add(id);
 					}
-					tmpList.remove(index);
-					tmpList.add(op2.getId());
-					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
-				}if(tmpList.contains(op2.getId())){
-					for(int i = 0;i<tmpList.size();i++){
-						if(tmpList.get(i).equals(op2.getId())){
-							index = i;
-						}
-					}
-					tmpList.remove(index);
-					tmpList.add(op1.getId());
-					childrenMap.put(new String(entry.getKey()), new LinkedList<>(tmpList));
 				}
 			}
-		}
-		for (Map.Entry<String, LinkedList<Integer>> entry : childrenMap.entrySet()) {
-			if (!actualMap.containsKey(entry.getKey())) {
-				actualMap.put(new String(entry.getKey()), new LinkedList<>(entry.getValue()));
-			}
+			actualMap.put(entry.getKey(), newList);
 		}
 		return actualMap;
 	}
 
 	public Map<String, LinkedList<Integer>> GetMapFullTabla() {
 		return parentList.getFirst().getStateMap();
-	}
-	
-	class CostComparator implements Comparator<NewParent> {
-	    @Override
-	    public int compare(NewParent a, NewParent b) {
-	        return a.getCost() < b.getCost() ? -1 : a.getCost() == b.getCost() ? 0 : 1;
-	    }
-
 	}
 }

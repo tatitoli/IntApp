@@ -60,112 +60,36 @@ public class MainForm extends Application {
 		long startTime = System.currentTimeMillis();
 		PresentationsDaoImp impDao = new PresentationsDaoImp();
 		LinkedList<PresentationOperator> operators = new LinkedList<>();
-		// operators = impDao.getPresentations(selectedFile);
 		operators = impDao.getPresentationsNew(selectedFile);
 		section = impDao.getSection(selectedFile);
-//		section.setDays(getDays(operators));
 		PresentationProblem problem = new PresentationProblem();
 		PresentationProblem.setOperators(operators);
 		problem.setSection(section);
 		problem.setMapSize(section.getSections());
 		problem.setX(section.getSectionNumber());
 		problem.setY(operators.size());
-		int db = 0, min = Integer.MAX_VALUE;
-		// Optimal algorithm = new Optimal(problem,min);
 		NewGenericAlgorythm algorithm = new NewGenericAlgorythm(problem);
-		// GeneticAlgorithm algorithm = new GeneticAlgorithm(problem);
 		boolean run = algorithm.run();
-		// if (run == false) {
-		// System.out.println("Nem lehet beosztani az elõadásokat!");
-		// }
 		Map<String, LinkedList<Integer>> intMap = algorithm.GetMapFullTabla();
-		int maxLenght = Integer.MIN_VALUE;
-		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
-			if (entry.getValue() != null && maxLenght < entry.getValue().size()) {
-				maxLenght = entry.getValue().size();
-			}
-		}
 		Map<String, LinkedList<Presentation>> finalTable = new HashMap<>();
-		table = new Presentation[section.getSectionNumber()][maxLenght * 2];
-		for (int i = 0; i < section.getSections().size(); i++) {
-			for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
-				LinkedList<Presentation> tmpList = new LinkedList<>();
-				if (entry.getKey().contains(section.getSections().get(i)) && entry.getKey().contains("DE")) {
-					LinkedList<Integer> temp = entry.getValue();
-					if (temp != null) {
-						tmpList = new LinkedList<>();
-						for (int j = 0; j < temp.size(); j++) {
-							for (PresentationOperator ope : operators) {
-								if (temp.get(j) == ope.getId()) {
-									tmpList.add(new Presentation(ope.getId(), ope.getPresentationTitle(),
-											ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(),
-											ope.getWeight(), ope.getInter()));
-									break;
-								}
-							}
-						}
-					}
-					finalTable.put(section.getSections().get(i), tmpList);
-				} else if (entry.getKey().contains(section.getSections().get(i)) && entry.getKey().contains("DU")) {
-					LinkedList<Integer> temp = entry.getValue();
-					if (temp != null) {
-						if (finalTable.get(section.getSections().get(i)) != null) {
-							tmpList = finalTable.get(section.getSections().get(i));
-						} else {
-							tmpList = new LinkedList<>();
-						}
-						for (int j = 0; j < temp.size(); j++) {
-							for (PresentationOperator ope : operators) {
-								if (temp.get(j) == ope.getId()) {
-									tmpList.add(new Presentation(ope.getId(), ope.getPresentationTitle(),
-											ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(),
-											ope.getWeight(), ope.getInter()));
-									break;
-								}
-							}
-						}
-					}
-					finalTable.put(section.getSections().get(i), new LinkedList<>(tmpList));
-				}
-			}
-		}
-		for (int i = 0; i < section.getSections().size(); i++) {
-			for (Map.Entry<String, LinkedList<Presentation>> entry : finalTable.entrySet()) {
-				if (entry.getKey().contains(section.getSections().get(i))) {
-					LinkedList<Presentation> temp = entry.getValue();
-					if (temp != null) {
-						for (int j = 0; j < temp.size(); j++) {
-							table[i][j] = new Presentation(temp.get(j).getId(), temp.get(j).getPresentationTitle(), temp.get(j).getActor(),
-									temp.get(j).getTopic(), temp.get(j).getFrom(), temp.get(j).getTo(), temp.get(j).isPoirity(), temp.get(j).getWeight(),
-									temp.get(j).getInter());
+		for (Map.Entry<String, LinkedList<Integer>> entry : intMap.entrySet()) {
+			LinkedList<Presentation> tmpList = new LinkedList<>();
+			LinkedList<Integer> temp = entry.getValue();
+			if (temp != null) {
+				tmpList = new LinkedList<>();
+				for (int j = 0; j < temp.size(); j++) {
+					for (PresentationOperator ope : operators) {
+						if (temp.get(j) == ope.getId()) {
+							tmpList.add(new Presentation(ope.getId(), ope.getPresentationTitle(), ope.getActor(),
+									ope.getTopic(), ope.getFrom(), ope.getTo(), ope.isPiority(), ope.getWeight(),
+									ope.getInter()));
+							break;
 						}
 					}
 				}
+				finalTable.put(entry.getKey(), tmpList);
 			}
 		}
-		// tableList = new LinkedList<>();
-		// for(int i =0;i<section.getDays().size();i++){
-		// table= new Presentation[section.getSectionNumber()][maxLenght];
-		// int k = 0;
-		// for (Map.Entry<String, LinkedList<Integer>> entry :
-		// intMap.entrySet()) {
-		// if(entry.getKey().contains(section.getDays().get(i))){
-		// LinkedList<Integer> temp = entry.getValue();
-		// for (int j = 0; j < temp.size(); j++) {
-		// for (PresentationOperator ope : operators) {
-		// if(temp.get(j) == ope.getId()){
-		// table[k][j] = new Presentation(ope.getId(),
-		// ope.getPresentationTitle(),
-		// ope.getActor(), ope.getTopic(), ope.getFrom(), ope.getTo(),
-		// ope.isPiority(), ope.getWeight(), ope.getInter());
-		// break;
-		// }
-		// }
-		// }
-		// k++;
-		// }
-		// }
-		// tableList.add(table);
 
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainForm.class.getResource("/Table.fxml"));
@@ -177,10 +101,9 @@ public class MainForm extends Application {
 
 			Scene scene = new Scene(fightView);
 			stage.setScene(scene);
-
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			TableControl controller = loader.getController();
-			controller.setFirstGrid(table, operators, section);
-//			controller.setFirstGrid(tableList, operators, section);
+			controller.setFirstGrid(finalTable, operators, section);
 			stage.setResizable(false);
 			stage.show();
 			Stage actualStage = (Stage) generateButton.getScene().getWindow();
@@ -212,7 +135,7 @@ public class MainForm extends Application {
 		loader.setLocation(MainForm.class.getResource("/MainForm.fxml"));
 		Parent root = loader.load();
 		Scene scene = new Scene(root, 389.0, 249);
-		// scene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Fõoldal");
 		primaryStage.setResizable(false);

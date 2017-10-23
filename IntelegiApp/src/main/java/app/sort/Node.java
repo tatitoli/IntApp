@@ -17,9 +17,6 @@ public class Node {
         this.parent = parent;
         this.state = state;
         this.typecost = parent == null ? 0 : getCostMap(state, operators);
-//        int typecost = parent == null ? 0 : getCostMap(state, operators);
-//        this.cost = parent == null ? 0 : this.typecost + getWeightPay(op);
-
     }
 
 	private int getWeightPay(PresentationOperator op) {
@@ -38,7 +35,6 @@ public class Node {
 			presentationMap.put(operator.getId(), operator);
 		}
 		List<String> typeList = new ArrayList<>();
-		List<String> actorList = new ArrayList<>();
 		int db = 0;
 		int cost = 0;
 		Map<String, LinkedList<Integer>> temp = s.getMapTabel();
@@ -46,7 +42,6 @@ public class Node {
 		for (Map.Entry<String, LinkedList<Integer>> entry : temp.entrySet()) {
 			db=0;
 			typeList = new ArrayList<>();
-			actorList = new ArrayList<>();
 			LinkedList<Integer> lista = entry.getValue();
 			for (int j = 0; j < lista.size(); j++) {
 				for (PresentationOperator o : operators) {
@@ -58,12 +53,6 @@ public class Node {
 				if (!typeList.contains(presentation.getTopic())) {
 					typeList.add(presentation.getTopic());
 				}
-//				if (!actorList.contains(presentation.getActor())) {
-//					actorList.add(presentation.getActor());
-//				}
-//				if (actorList.contains(presentation.getActor())) {
-//					cost += 5;
-//				}
 			}
 			if (typeList != null) {
 				db += typeList.size() - 1;

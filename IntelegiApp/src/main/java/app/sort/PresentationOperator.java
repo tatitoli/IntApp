@@ -20,6 +20,8 @@ public class PresentationOperator {
 	final String FORMAT = "mm:ss";
 
 	private int id;
+	private String timeTo;
+	private String timeFrom;
 	private String presentationTitle;
 	private String actor;
 	private String topic;
@@ -30,7 +32,7 @@ public class PresentationOperator {
 	private int weight;
 	private LinkedList<String> insertPos;
 
-	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String inter) {
+	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String inter, String timeFrom, String timeTo) {
 		super();
 		this.id = id;
 		this.presentationTitle = presentationTitle;
@@ -38,19 +40,8 @@ public class PresentationOperator {
 		this.topic = topic;
 		this.from = from;
 		this.inter = inter;
-	}
-
-	public PresentationOperator(int id, String presentationTitle, String actor, String topic, String from, String to,
-			boolean piority, int weight) {
-		super();
-		this.id = id;
-		this.presentationTitle = presentationTitle;
-		this.actor = actor;
-		this.topic = topic;
-		this.from = from;
-		this.to = to;
-		this.piority = piority;
-		this.weight = weight;
+		this.timeFrom = timeFrom;
+		this.timeTo = timeTo;
 	}
 
 	public PresentationOperator() {

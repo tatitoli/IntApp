@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
@@ -11,56 +10,71 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.TableControl">
+<AnchorPane maxHeight="750.0" maxWidth="1024.0" prefHeight="760.0" prefWidth="1024.0" style="-fx-background-color: #afb6c6;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.TableControl">
 	<children>
 		<TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
 
 		</TabPane>
-		<Pane layoutX="454.0" prefHeight="480.0" prefWidth="270.0">
+		<Pane layoutX="600.0" prefHeight="760.0" prefWidth="424.0">
 			<children>
-				<GridPane layoutX="4.0" layoutY="80.0">
-					<columnConstraints>
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" prefWidth="131.0" />
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="132.0" />
-					</columnConstraints>
-					<rowConstraints>
-						<RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-						<RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-						<RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-						<RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-					</rowConstraints>
-					<children>
-						<Label text="Előadás címe">
-							<font>
-								<Font name="Times New Roman" size="16.0" />
-							</font>
-						</Label>
-						<Label text="Előadó" GridPane.rowIndex="1">
-							<font>
-								<Font name="Times New Roman" size="16.0" />
-							</font>
-						</Label>
-						<Label text="Előadás témája" GridPane.rowIndex="2">
-							<font>
-								<Font name="Times New Roman" size="16.0" />
-							</font>
-						</Label>
-						<Label text="Előadás időpontja" GridPane.rowIndex="3">
-							<font>
-								<Font name="Times New Roman" size="16.0" />
-							</font>
-						</Label>
-						<Label fx:id="title" text="Label" GridPane.columnIndex="1" />
-						<Label fx:id="presentatior" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-						<Label fx:id="topic" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-						<Label fx:id="time" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-					</children>
-				</GridPane>
-            <Button fx:id="reGenerate" layoutX="97.0" layoutY="300.0" mnemonicParsing="false" onAction="#excelExportAction" text="Excel Export" />
+      				<GridPane alignment="TOP_CENTER" layoutX="2.0" layoutY="171.0" prefHeight="402.0" prefWidth="424.0" style="-fx-border-color: #657087; -fx-border-width: 2px;">
+      					<columnConstraints>
+      						<ColumnConstraints maxWidth="480.0" minWidth="10.0" prefWidth="424.0" />
+                  <ColumnConstraints maxWidth="31.0" minWidth="0.0" prefWidth="0.0" />
+      					</columnConstraints>
+      					<rowConstraints>
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      						<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+      					</rowConstraints>
+      					<children>
+      						<Label alignment="CENTER" prefHeight="49.0" prefWidth="432.0" style="-fx-background-color: #657087;" text="Előadás címe" textAlignment="CENTER" textFill="WHITE" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+      							<font>
+      								<Font name="Times New Roman Bold" size="18.0" />
+      							</font>
+      						</Label>
+      						<Label alignment="CENTER" contentDisplay="BOTTOM" prefHeight="50.0" prefWidth="431.0" style="-fx-background-color: #657087;" text="Előadó" textAlignment="CENTER" textFill="WHITE" GridPane.rowIndex="2">
+      							<font>
+      								<Font name="Times New Roman Bold" size="18.0" />
+      							</font>
+      						</Label>
+      						<Label alignment="CENTER" prefHeight="50.0" prefWidth="434.0" style="-fx-background-color: #657087;" text="Előadás témája" textAlignment="CENTER" textFill="WHITE" GridPane.rowIndex="4">
+      							<font>
+      								<Font name="Times New Roman Bold" size="18.0" />
+      							</font>
+      						</Label>
+      						<Label alignment="CENTER" prefHeight="50.0" prefWidth="424.0" style="-fx-background-color: #657087;" text="Előadás időpontja" textAlignment="CENTER" textFill="WHITE" GridPane.rowIndex="6">
+      							<font>
+      								<Font name="Times New Roman Bold" size="18.0" />
+      							</font>
+      						</Label>
+      						<Label fx:id="title" alignment="CENTER" contentDisplay="CENTER" prefHeight="55.0" prefWidth="420.0" textAlignment="CENTER" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+      						<Label fx:id="presentatior" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="420.0" textAlignment="CENTER" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+      						<Label fx:id="topic" alignment="CENTER" prefHeight="49.0" prefWidth="420.0" textAlignment="CENTER" GridPane.rowIndex="5">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+      						<Label fx:id="time" alignment="CENTER" prefHeight="51.0" prefWidth="420.0" textAlignment="CENTER" GridPane.rowIndex="7">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+      					</children>
+      				</GridPane>
+            <Button fx:id="reGenerate" alignment="CENTER" layoutX="164.0" layoutY="68.0" mnemonicParsing="false" onAction="#reGenerateAction" prefHeight="50.0" prefWidth="100.0" text="Előadás újragenerálása" textAlignment="CENTER" wrapText="true" />
+            <Button layoutX="79.0" layoutY="655.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" onAction="#xlsExportAction" text="Xls Export" />
+            <Button layoutX="279.0" layoutY="655.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" onAction="#xlsxExportAction" text="Xlsx Export" />
 			</children>
-         <padding>
-            <Insets left="10.0" right="10.0" />
-         </padding>
 		</Pane>
 	</children>
 </AnchorPane>

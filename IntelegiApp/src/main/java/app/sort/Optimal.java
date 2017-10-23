@@ -4,7 +4,6 @@
  */
 package app.sort;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ public class Optimal {
 	public boolean run() {
 		closedNodes = new LinkedList<>();
 		openNodes = new LinkedList<>();
-//		openNodes.add(new Node(p.startState(), null, null, null));
 		openNodes.add(new Node(p.startMapState(PresentationProblem.operators), null, null, null));
 		while (true) {
 			if (openNodes.isEmpty()) {
@@ -96,31 +94,6 @@ public class Optimal {
 			i++;
 		}
 		return index;
-	}
-	
-	private boolean search(List<Node> nodeList, PresentationState state) {
-		int[][] actualState = state.getTable();
-		ArrayList<Integer> nodeArrayList = new ArrayList<>();
-		ArrayList<Integer> stateArrayList = new ArrayList<>();
-		for (Node node : nodeList) {
-			int[][]nodeState = node.getState().getTable();
-			for (int i = 0; i < nodeState.length; i++) {
-				nodeArrayList = new ArrayList<>();
-				stateArrayList = new ArrayList<>();
-				for (int j = 0; j < nodeState[i].length; j++) {
-					if(nodeState[i][j] != 0){
-						nodeArrayList.add(nodeState[i][j]);
-					}
-					if(actualState[i][j] != 0){
-						stateArrayList.add(actualState[i][j]);
-					}
-				}
-				if(nodeArrayList.contains(stateArrayList)){
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 	
 	private boolean searchMap(List<Node> nodeList, PresentationState state) {

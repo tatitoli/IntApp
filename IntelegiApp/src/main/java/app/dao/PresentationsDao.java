@@ -2,6 +2,7 @@ package app.dao;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.Map;
 
 import app.model.Section;
 import app.sort.Presentation;
@@ -11,15 +12,14 @@ public interface PresentationsDao {
 	
 	LinkedList<PresentationOperator> readPresentations();
 	
-	LinkedList<PresentationOperator> getPresentations();
+	void writePresentationsXls(Map<String, LinkedList<Presentation>> table, Section section);
 	
-	void writePresentations(Presentation[][] table, Section section);
-
-	LinkedList<PresentationOperator> getPresentations(File file);
+	void writePresentationsXlsx(Map<String, LinkedList<Presentation>> table, Section section);
 	
 	LinkedList<PresentationOperator> getPresentationsInter(File file);
 	
 	LinkedList<PresentationOperator> getPresentationsNew(File file);
 
 	Section getSection(File input);
+	
 }

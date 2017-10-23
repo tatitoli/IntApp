@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -29,133 +31,8 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 
 	@Override
-	public LinkedList<PresentationOperator> getPresentations() {
-		LinkedList<PresentationOperator> operators = new LinkedList<>();
-		try {
-			FileInputStream file = new FileInputStream(new File("test.xls"));
-			HSSFWorkbook workbook = new HSSFWorkbook(file);
-			HSSFSheet sheet = workbook.getSheetAt(1);
-			int i = 1;
-			Iterator<Row> rowIterator = sheet.iterator();
-			while (rowIterator.hasNext()) {
-				Row row = rowIterator.next();
-				if (row.getRowNum() > 0) {
-					String presentationTitle = null;
-					String actor = null;
-					String topic = null;
-					String from = null;
-					String intervallum = null;
-					String to = null;
-					String fontos = null;
-					Iterator<Cell> cellIterator = row.cellIterator();
-					while (cellIterator.hasNext()) {
-						Cell cell = cellIterator.next();
-						switch (cell.getColumnIndex()) {
-						case 0:
-							presentationTitle = cell.getStringCellValue();
-							break;
-						case 1:
-							actor = cell.getStringCellValue();
-							break;
-						case 2:
-							topic = cell.getStringCellValue();
-							break;
-						case 3:
-							from = new DataFormatter().formatCellValue(cell);
-							break;
-						case 4:
-							to = new DataFormatter().formatCellValue(cell);
-							break;
-						case 5:
-							fontos = cell.getStringCellValue();
-							break;
-						}
-					}
-					if ("Fontos".equals(fontos)) {
-						operators.addFirst(
-								new PresentationOperator(i, presentationTitle, actor, topic, from, to, true, 15));
-					} else {
-						operators
-								.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, false, 15));
-					}
-					i++;
-				}
-			}
-			file.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return operators;
-	}
-
-	@Override
-	public LinkedList<PresentationOperator> getPresentations(File input) {
-		LinkedList<PresentationOperator> operators = new LinkedList<>();
-		try {
-			FileInputStream file = new FileInputStream(input);
-			HSSFWorkbook workbook = new HSSFWorkbook(file);
-			HSSFSheet sheet = workbook.getSheetAt(1);
-			int i = 1;
-			Iterator<Row> rowIterator = sheet.iterator();
-			while (rowIterator.hasNext()) {
-				Cell cell = null;
-				Row row = rowIterator.next();
-				if (row.getRowNum() > 0) {
-					String presentationTitle = null;
-					String actor = null;
-					String topic = null;
-					String from = null;
-					String to = null;
-					String fontos = null;
-					Iterator<Cell> cellIterator = row.cellIterator();
-					while (cellIterator.hasNext()) {
-						cell = cellIterator.next();
-						switch (cell.getColumnIndex()) {
-						case 0:
-							presentationTitle = cell.getStringCellValue();
-							break;
-						case 1:
-							actor = cell.getStringCellValue();
-							break;
-						case 2:
-							topic = cell.getStringCellValue();
-							break;
-						case 3:
-							from = new DataFormatter().formatCellValue(cell);
-							break;
-						case 4:
-							to = new DataFormatter().formatCellValue(cell);
-							break;
-						case 5:
-							fontos = cell.getStringCellValue();
-							break;
-						}
-					}
-					if ("Fontos".equals(fontos)) {
-						operators.addFirst(
-								new PresentationOperator(i, presentationTitle, actor, topic, from, to, true, 15));
-					} else {
-						operators
-								.add(new PresentationOperator(i, presentationTitle, actor, topic, from, to, false, 15));
-					}
-					i++;
-				}
-			}
-			file.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return operators;
-	}
-
-	@Override
 	public Section getSection(File input) {
 		LinkedList<String> sections = new LinkedList<>();
-		LinkedList<String> dates = new LinkedList<>();
 		Section section = null;
 		try {
 			FileInputStream file = new FileInputStream(input);
@@ -303,6 +180,7 @@ public class PresentationsDaoImp implements PresentationsDao {
 					String actor = null;
 					String topic = null;
 					String from = null;
+					String shortFrom = null;
 					String intervallum = null;
 					Iterator<Cell> cellIterator = row.cellIterator();
 					while (cellIterator.hasNext()) {
@@ -323,10 +201,15 @@ public class PresentationsDaoImp implements PresentationsDao {
 						case 4:
 							from = new DataFormatter().formatCellValue(cell);
 							break;
-
 						}
+					}if("Délután".equals(from)){
+						shortFrom = "DU";
+					}else if("Délelõtt".equals(from)){
+						shortFrom = "DE";
+					}else{
+						shortFrom = "BAR";
 					}
-					operators.add(new PresentationOperator(i, presentationTitle, actor, topic, from, intervallum));
+					operators.add(new PresentationOperator(i, presentationTitle, actor, topic, shortFrom, intervallum, null, null));
 					i++;
 				}
 			}
@@ -340,34 +223,117 @@ public class PresentationsDaoImp implements PresentationsDao {
 	}
 
 	@Override
-	public void writePresentations(Presentation[][] table, Section section) {
-		final String FILE_NAME = "EloadasExcel.xlsx";
-		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("Elõadás");
-		Object[][] datatypes = new Object[table.length][table[0].length];
-		for (int i = 0; i < table.length; i++) {
-			for (int j = 0; j < table[i].length; j++) {
-				if(table[i][j] != null){
-					datatypes[i][j] = table[i][j].getPresentationTitle();
+	public void writePresentationsXls(Map<String, LinkedList<Presentation>> finalTable, Section section) {
+		final String FILE_NAME = "EloadasExcel.xls";
+		HSSFWorkbook workbook = new HSSFWorkbook();
+		HSSFSheet  sheet = workbook.createSheet("Elõadás");
+		Map<String, LinkedList<Presentation>> tmpMap = new HashMap<>();
+		for (Map.Entry<String, LinkedList<Presentation>> map : finalTable.entrySet()) {
+			if(!tmpMap.containsKey(map.getKey().substring(0, map.getKey().length()-2)) && map.getKey().contains("DE")){
+				tmpMap.put(map.getKey().substring(0, map.getKey().length()-2), map.getValue());
+			}
+		}
+		for (Map.Entry<String, LinkedList<Presentation>> map : finalTable.entrySet()) {
+			if(tmpMap.containsKey(map.getKey().substring(0, map.getKey().length()-2)) && map.getKey().contains("DU")){
+				LinkedList<Presentation> tmpListOld = tmpMap.get(map.getKey().substring(0, map.getKey().length()-2));
+				LinkedList<Presentation> tmpList = map.getValue();
+				for (Presentation presentation : tmpList) {
+					tmpListOld.add(presentation);
 				}
+				tmpMap.put(map.getKey().substring(0, map.getKey().length()-2), tmpListOld);
 			}
 		}
 		int rowNum = 0;
-		for (Object[] datatype : datatypes) {
-            Row row = sheet.createRow(rowNum++);
-            int colNum = 0;
-            Cell cell = row.createCell(colNum++);
-            cell.setCellValue((String) section.getSections().get(rowNum-1));
-            for (Object field : datatype) {
-                cell = row.createCell(colNum++);
-                if (field instanceof String) {
-                    cell.setCellValue((String) field);
-                } else if (field instanceof Integer) {
-                    cell.setCellValue((Integer) field);
-                }
-            }
+		Row row = sheet.createRow(rowNum++);
+		int colNum = 0;
+        Cell cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadás kezdete");
+        cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadó");
+        cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadás címe");
+		for (Map.Entry<String, LinkedList<Presentation>> map : tmpMap.entrySet()) {
+			row = sheet.createRow(rowNum++);
+          colNum = 0;
+          cell = row.createCell(colNum++);
+          cell.setCellValue((String) map.getKey());
+          row = sheet.createRow(rowNum++);
+          colNum = 0;
+          for (Presentation field : map.getValue()) {
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getFromTime());
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getActor());
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getPresentationTitle());
+              if(colNum>= 3){
+            	  row = sheet.createRow(rowNum++);
+            	  colNum=0;
+              }
+          }
+		}
+        try {
+            FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
+	}
+	
+	@Override
+	public void writePresentationsXlsx(Map<String, LinkedList<Presentation>> finalTable, Section section) {
+		final String FILE_NAME = "EloadasExcel.xlsx";
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Elõadás");
+		Map<String, LinkedList<Presentation>> tmpMap = new HashMap<>();
+		for (Map.Entry<String, LinkedList<Presentation>> map : finalTable.entrySet()) {
+			if(!tmpMap.containsKey(map.getKey().substring(0, map.getKey().length()-2)) && map.getKey().contains("DE")){
+				tmpMap.put(map.getKey().substring(0, map.getKey().length()-2), map.getValue());
+			}
+		}
+		for (Map.Entry<String, LinkedList<Presentation>> map : finalTable.entrySet()) {
+			if(tmpMap.containsKey(map.getKey().substring(0, map.getKey().length()-2)) && map.getKey().contains("DU")){
+				LinkedList<Presentation> tmpListOld = tmpMap.get(map.getKey().substring(0, map.getKey().length()-2));
+				LinkedList<Presentation> tmpList = map.getValue();
+				for (Presentation presentation : tmpList) {
+					tmpListOld.add(presentation);
+				}
+				tmpMap.put(map.getKey().substring(0, map.getKey().length()-2), tmpListOld);
+			}
+		}
+		int rowNum = 0;
+		Row row = sheet.createRow(rowNum++);
+		int colNum = 0;
+        Cell cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadás kezdete");
+        cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadó");
+        cell = row.createCell(colNum++);
+        cell.setCellValue((String) "Elõadás címe");
+		for (Map.Entry<String, LinkedList<Presentation>> map : tmpMap.entrySet()) {
+			row = sheet.createRow(rowNum++);
+          colNum = 0;
+          cell = row.createCell(colNum++);
+          cell.setCellValue((String) map.getKey());
+          row = sheet.createRow(rowNum++);
+          colNum = 0;
+          for (Presentation field : map.getValue()) {
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getFromTime());
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getActor());
+              cell = row.createCell(colNum++);
+              cell.setCellValue((String) field.getPresentationTitle());
+              if(colNum>= 3){
+            	  row = sheet.createRow(rowNum++);
+            	  colNum=0;
+              }
+          }
+		}
         try {
             FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
             workbook.write(outputStream);

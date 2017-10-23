@@ -5,10 +5,10 @@ import java.util.Map;
 
 public class NewParent {
 	Map<String, LinkedList<Integer>> stateMap;
-	Integer cost;
+	Double cost;
 	Double fitness;
 
-	public NewParent(Map<String, LinkedList<Integer>> stateMap, Integer cost) {
+	public NewParent(Map<String, LinkedList<Integer>> stateMap, Double cost) {
 		super();
 		this.stateMap = stateMap;
 		this.cost = cost;
@@ -22,11 +22,11 @@ public class NewParent {
 		this.stateMap = stateMap;
 	}
 
-	public Integer getCost() {
+	public Double getCost() {
 		return cost;
 	}
 
-	public void setCost(Integer cost) {
+	public void setCost(Double cost) {
 		this.cost = cost;
 	}
 
